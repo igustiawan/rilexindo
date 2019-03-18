@@ -85,9 +85,9 @@
                                     <input type="text" readonly name="txt_tgl_transaksi" class="form-control pull-right" id="txt_tgl_transaksi" value="<?php echo date('Y-m-d')?>" >                    
                                 </div>
                             </div>
-                            <label for="dari" class="col-md-3 control-label">Jumlah dibayar</label>
+                            <label for="dari" class="col-md-3 control-label">Sisa Piutang</label>
                             <div class="col-md-3 col-sm-12 ">
-                                <input type="text" readonly maxlength="30" class="form-control" id="txt_jml_bayar" name="txt_jml_bayar" >                        
+                                <input type="text" readonly maxlength="30" class="form-control" id="txt_sisa_piutang" name="txt_sisa_piutang" >                        
                             </div>
                         </div> 
                         <div class="form-group">  
@@ -308,7 +308,7 @@
                 Baris += "<input type='hidden' name='sisa_piutang[]'>";
                 Baris += "<span></span>";
 		    Baris += "</td>"; 
-            Baris += "<td><input type='text' class='form-control' id='jml_bayar' name='jml_bayar[]' onchange='PemisahTitik(this)' onkeypress='return mask(this,event);'  disabled></td>";
+            Baris += "<td><input type='text' class='form-control' id='jml_bayar' name='jml_bayar[]'  onkeypress='return mask(this,event);'  disabled></td>";
             Baris += "<td><button class='btn btn-default' id='HapusBaris'><i class='fa fa-times' style='color:red;'></i></button></td>";
             Baris += "</tr>";
 
@@ -318,6 +318,7 @@
             $(this).find('td:nth-child(2) input').focus();
         });
         HitungTotalBayar();
+        HitungSisaPiutang();
     }
   
     $(document).on('click', '#HapusBaris', function(e){
@@ -330,6 +331,7 @@
 		Nomor++;
 	});
     HitungTotalBayar();
+    HitungSisaPiutang();
 });
 
 function AutoCompleteGue(Lebar, KataKunci, Indexnya)
@@ -384,6 +386,7 @@ function AutoCompleteGue(Lebar, KataKunci, Indexnya)
 		}
 	});
     HitungTotalBayar();
+    HitungSisaPiutang();
 }
 
 $(document).on('keyup', '#pencarian_kode', function(e){
@@ -395,6 +398,7 @@ $(document).on('keyup', '#pencarian_kode', function(e){
         $('#TabelTransaksi tbody tr:eq('+$(this).parent().parent().index()+') td:nth-child(2)').find('div#hasil_pencarian').hide();
     }
     HitungTotalBayar();
+    HitungSisaPiutang();
 });
 
 $(document).on('click', '#daftar-autocomplete li', function(){
@@ -408,6 +412,8 @@ $(document).on('click', '#daftar-autocomplete li', function(){
     var Sisapiutang = $(this).find('span#sisapiutang').html();
     var Noref = $(this).find('span#noref').html();
 
+   
+
 	$('#TabelTransaksi tbody tr:eq('+Indexnya+') td:nth-child(2)').find('div#hasil_pencarian').hide();
     $('#TabelTransaksi tbody tr:eq('+Indexnya+') td:nth-child(3) input').val(Noref);
     $('#TabelTransaksi tbody tr:eq('+Indexnya+') td:nth-child(3) span').html(Noref);
@@ -417,7 +423,7 @@ $(document).on('click', '#daftar-autocomplete li', function(){
     $('#TabelTransaksi tbody tr:eq('+Indexnya+') td:nth-child(5) span').html(tgljtp);
     $('#TabelTransaksi tbody tr:eq('+Indexnya+') td:nth-child(6)').html(to_rupiah(Nompiutang));
     // $('#TabelTransaksi tbody tr:eq('+Indexnya+') td:nth-child(7)').html(to_rupiah(Sisapiutang));
-    $('#TabelTransaksi tbody tr:eq('+Indexnya+') td:nth-child(7) input').val(to_rupiah(Sisapiutang));
+    $('#TabelTransaksi tbody tr:eq('+Indexnya+') td:nth-child(7) input').val((Sisapiutang));
     $('#TabelTransaksi tbody tr:eq('+Indexnya+') td:nth-child(7) span').html(to_rupiah(Sisapiutang));
 	$('#TabelTransaksi tbody tr:eq('+Indexnya+') td:nth-child(8) input').removeAttr('disabled').val((Sisapiutang));
 
@@ -431,6 +437,7 @@ $(document).on('click', '#daftar-autocomplete li', function(){
 		$('#TabelTransaksi tbody tr:eq('+Indexnya+') td:nth-child(8) input').focus();
 	}
     HitungTotalBayar();
+    HitungSisaPiutang();
 });
 
 function to_rupiah(angka){
@@ -465,6 +472,7 @@ $(document).on('click', 'button#SimpanTransaksi', function(){
 function SimpanTransaksi()
 {
     var FormData = "tgltransaksi="+encodeURI($('#txt_tgl_transaksi').val());
+    FormData += "&sisapiutang="+$('#txt_sisa_piutang').val();
     FormData += "&" + $('#TabelTransaksi tbody input').serialize();
     FormData += "&nobg="+$('#txt_no_bg').val();
     FormData += "&norek="+$('#rekening').val();
@@ -479,6 +487,7 @@ function SimpanTransaksi()
     FormData += "&totalbayar="+encodeURI($('#txt_total_bayar').val());
     FormData += "&keterangan="+$('#txt_keterangan').val();
     FormData += "&kd_cust="+$('#txt_kd_cust').val();
+
 
     $.ajax({
         url:"<?php echo base_url('transaksi/pembayaran/simpan_pembayaran')?>",
@@ -521,6 +530,7 @@ $(document).on('keyup', '#jml_bayar', function(){
     $('#TabelTransaksi tbody tr:eq('+Indexnya+') td:nth-child(8) input').val(SubTotalVal);
     $('#TabelTransaksi tbody tr:eq('+Indexnya+') td:nth-child(8) span').html(SubTotal);
     HitungTotalBayar();
+    HitungSisaPiutang();
 });
 
 function HitungTotalBayar()
@@ -533,9 +543,22 @@ function HitungTotalBayar()
 			Total = parseInt(Total) + parseInt(SubTotal);
 		}
 	});
-  
+ 
     $('#txt_total_bayar').val(to_rupiah(Total));
-    $('#txt_jml_bayar').val(to_rupiah(Total));
 }
 
+
+function HitungSisaPiutang()
+{
+	var Total = 0;
+	$('#TabelTransaksi tbody tr').each(function(){
+		if($(this).find('td:nth-child(7) input').val() > 0)
+		{
+			var SubTotal = $(this).find('td:nth-child(7) input').val();
+			Total = parseInt(Total) + parseInt(SubTotal);
+		}
+	});
+  
+    $('#txt_sisa_piutang').val(to_rupiah(Total));
+}
 </script>
