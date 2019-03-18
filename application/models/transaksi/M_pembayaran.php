@@ -78,7 +78,7 @@ class M_pembayaran extends CI_Model {
     function insert_pembayaran(
 						$No_Transaksi, $Tgl_Transaksi, $Kd_Cust, $No_Bg, $Tgl_Bg, $No_Rek, $Bank_Bg,
 						$Bank_Ku, $Tgl_Ku, $Nominal_Tunai, $Nominal_Bg, $Nominal_Ku, $Total_Pembayaran, 
-						$Keterangan,$Created_By, $Created_Date
+						$Keterangan,$Created_By, $Created_Date,$Status
 						)
 	{
 		$dt = array(
@@ -91,17 +91,17 @@ class M_pembayaran extends CI_Model {
 			'Bank_Bg' => $Bank_Bg,
 			'Bank_Ku' => $Bank_Ku,
 			'Tgl_Ku' => $Tgl_Ku,
-			'Nominal_Tunai' => $Nominal_Tunai,
-			'Nominal_Bg' => $Nominal_Bg,
-			'Nominal_Ku' => $Nominal_Ku,
-			'Total_Pembayaran' => $Total_Pembayaran,		
+			'Nominal_Tunai' => preg_replace("/[^0-9]/", "", $Nominal_Tunai),
+			'Nominal_Bg' => preg_replace("/[^0-9]/", "", $Nominal_Bg),
+			'Nominal_Ku' => preg_replace("/[^0-9]/", "", $Nominal_Ku),
+			'Total_Pembayaran' => preg_replace("/[^0-9]/", "", $Total_Pembayaran),		
 			'Keterangan' => $Keterangan,		
 			'Created_By' => $Created_By,
-			'Created_Date' => $Created_Date
-			
+			'Created_Date' => $Created_Date,
+			'Status' => $Status
 
 			// 'Tipe_Transaksi' => $Tipe_Transaksi,
-			// 'Status' => $Status,
+			
 			// 'Cashback' => $Cashback,
 			// 'Denda' => $Denda,
 			// 'Tgl_Ambil_Titipan' => $Tgl_Ambil_Titipan,
@@ -122,7 +122,7 @@ class M_pembayaran extends CI_Model {
 			'No_Transaksi' => $No_Transaksi,
 			'No_So	' => $No_So,
 			'No_Ref' => $No_Ref,
-			'Jumlah_Dibayar' => $Jumlah_Dibayar,
+			'Jumlah_Dibayar' => preg_replace("/[^0-9]/", "", $Jumlah_Dibayar),
 			'Tgl_Ref' => $Tgl_Ref,
 			'Tgl_Jtp' => $Tgl_Jtp
 		);
@@ -199,5 +199,15 @@ class M_pembayaran extends CI_Model {
 		return $this->db->query($sql);
 	}
 
-	
+	function hapus_pembayaran($No_Transaksi)
+	{
+		$dt = array(
+			'Status' => 'Batal'
+		);
+
+		return $this->db
+			->where('No_Transaksi', $No_Transaksi)
+			->update('tb_pembayaran', $dt);
+	}
+
 }   

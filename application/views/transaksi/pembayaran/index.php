@@ -12,8 +12,6 @@
         <a  style="margin-right: 5px;" href="<?php echo base_url('transaksi/pembayaran/tambah')?>" class="btn btn-primary pull-right"><i class="fa fa-plus"></i> INPUT PEMBAYARAN</a>
     </div>
   </div>
-
-
   </section>
 
 <!-- Main content -->
@@ -24,12 +22,15 @@
       <div class="col-md-12">
 
         <div class="box box-primary">
+        
         <!--
           <div class="box-header with-border">
             <h3 class="box-title"></h3>
           </div><! /.box-header -->
           <div class="box-body">
+         
             <div class="row">
+              
               <div class="col-md-12">
                 <table id="dataTable" class="table table-bordered table-striped">
                  <thead>
@@ -85,5 +86,33 @@
         });
     });
 
+    $(document).on('click', '#HapusPembayaran', function(e){
+        e.preventDefault();
+        var Link = $(this).attr('href');
+
+        $('.modal-dialog').removeClass('modal-lg');
+        $('.modal-dialog').addClass('modal-sm');
+        $('#ModalHeader').html('Konfirmasi');
+        $('#ModalContent').html('Apakah anda yakin ingin menghapus <br /><b>'+$(this).parent().parent().find('td:nth-child(1)').html()+'</b> ?');
+        $('#ModalFooter').html("<button type='button' class='btn btn-primary' id='YesDeletePembayaran' data-url='"+Link+"'>Ya, saya yakin</button><button type='button' class='btn btn-default' data-dismiss='modal'>Batal</button>");
+        $('#ModalGue').modal('show');
+    });
+
+    $(document).on('click', '#YesDeletePembayaran', function(e){
+        e.preventDefault();
+        $('#ModalGue').modal('hide');
+
+        $.ajax({
+          url: $(this).data('url'),
+          type: "POST",
+          cache: false,
+          dataType:'json',
+          success: function(data){
+            alert(data.pesan);
+            $('#dataTable').DataTable().ajax.reload( null, false );
+          }
+        });
+    });
 </script>
+
 

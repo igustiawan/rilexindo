@@ -41,9 +41,21 @@ class Pembayaran extends MY_Controller {
             $row[] = $field->No_Transaksi;
             $row[] = $field->Tgl_Transaksi;
             $row[] = $field->Nm_Cust;     
-			$row[] = $field->Total_Pembayaran;
-			$row[] = $field->Status;
-			$row[] = "";
+			$row[] = number_format($field->Total_Pembayaran, '0', ',', '.');
+			if ($field->Status=="Waiting Process"){
+                $row[]='<span class="label label-success">Waiting Process</span>';	
+                $row[] = 
+				'
+				<a href='.base_url('transaksi/pembayaran/ubah_pembayaran/'.$field->No_Transaksi).' class="btn btn-warning btn-xs" id="EditPembayaran" title="Ubah" rel="tooltip"><i class="fa fa-pencil"></i></a>
+         		<a class="btn btn-info btn-xs"  title="Proses" rel="tooltip"><i class="fa fa-upload" ></i></a>
+			   	<a href='.base_url('transaksi/pembayaran/hapus_pembayaran/'.$field->No_Transaksi).' class="btn btn-danger btn-xs" id="HapusPembayaran" title="Batal" rel="tooltip"><i class="fa fa-trash"></i></a>
+			    '
+				;					
+			}
+			elseif ($field->Status=="Batal"){             
+				$row[]='<span class="label label-warning">Batal</span>';	
+                $row[]="";
+			}
 			$data[] = $row;					
         } 
         $output = array(
@@ -54,6 +66,26 @@ class Pembayaran extends MY_Controller {
 		);
 		
         echo json_encode($output);
+	}
+
+	public function hapus_pembayaran($No_Transaksi)
+	{
+			if($this->input->is_ajax_request())
+			{
+				$hapus = $this->pembayaran->hapus_pembayaran($No_Transaksi);
+				if($hapus)
+				{
+					echo json_encode(array(
+						"pesan" => "Data berhasil dihapus
+					"));
+				}
+				else
+				{
+					echo json_encode(array(
+						"pesan" => "Terjadi kesalahan, coba lagi !
+					"));
+				}
+			}	
 	}
 
 	public function get_nama_bank()
@@ -124,7 +156,6 @@ class Pembayaran extends MY_Controller {
 		return "01BR".$tahun.$bulan.$kd;
 	}
 
-	
 	public function simpan_pembayaran()
 	{		
 		if($_POST)
@@ -152,6 +183,7 @@ class Pembayaran extends MY_Controller {
 									$No_Transaksi 			= $this->idpembayaran();  
 									$Tgl_Transaksi			= $this->input->post('tgltransaksi');
 									$Kd_Cust				= $this->input->post('kd_cust');
+									$Status					= "Waiting Process";
 									$No_Bg					= $this->input->post('nobg');
 									$Tgl_Bg					= $this->input->post('tglbg');
 									$No_Rek					= $this->input->post('norek');
@@ -164,20 +196,20 @@ class Pembayaran extends MY_Controller {
 									$Total					= $this->input->post('total');
 									$Total_Pembayaran		= $this->input->post('totalbayar');
 									$Keterangan				= $this->input->post('keterangan');
-									$Sisa_Piutang			= $this->input->post('sisa_piutang');
+									$Sisa_Piutang			= $this->input->post('sisapiutang');
 									$Created_By				= $this->session->userdata['nama_lengkap'];
 									$Created_Date			= date('Y-m-d');
-									
-									echo $Sisa_Piutang;
-									return false;
-									// if ($Total_Pembayaran > $Sisa_Piutang)
-									// {
-									// 	$this->query_error("Nilai Yang dibayar tidak boleh lebih besar dari sisa piutang");
-									// }
+						
+									if ($Total_Pembayaran > $Sisa_Piutang)
+									{
+										$this->query_error("Nilai Yang dibayar tidak boleh lebih besar dari sisa piutang");
+										die;
+									}
 
 									if ($Total != $Total_Pembayaran)
 									{
 										$this->query_error("Nilai yang harus dibayar Tidak sama dengan jumlah uang yang dibayar </br> data tidak bisa di simpan");
+										die;
 									}else{
 
 										$pembayaran = $this->pembayaran->insert_pembayaran(
@@ -196,7 +228,8 @@ class Pembayaran extends MY_Controller {
 															$Total_Pembayaran, 
 															$Keterangan,
 															$Created_By, 
-															$Created_Date);
+															$Created_Date,
+															$Status);
 
 										if($pembayaran){
 											$inserted	= 0;
@@ -214,7 +247,13 @@ class Pembayaran extends MY_Controller {
 													
 													$inserted++;
 													
-													$insert_detail	= $this->pembayaran->insert_pembayaran_detail($No_Transaksi, $No_So, $No_Ref, $Jumlah_Dibayar, $Tgl_Ref, $Tgl_Jtp);
+													$insert_detail	= $this->pembayaran->insert_pembayaran_detail(
+																						$No_Transaksi, 
+																						$No_So, 
+																						$No_Ref, 
+																						$Jumlah_Dibayar, 
+																						$Tgl_Ref, 
+																						$Tgl_Jtp);
 													
 												}
 
@@ -254,10 +293,10 @@ class Pembayaran extends MY_Controller {
 	public function cek_no_so($no_so)
 	{
 		$this->load->model('transaksi/M_salesorder');
-		$cek_no_so = $this->M_salesorder->cek_no_so($no_so);
+					$cek_no_so = $this->M_salesorder->cek_no_so($no_so);
 
 		if($cek_no_so->num_rows() > 0)
-		{
+			{
 			return TRUE;
 		}
 		return FALSE;
