@@ -229,29 +229,4 @@
 <?php endforeach; ?>
 <!-- END MODAL PERSETUJUAN BAST -->
 
-<!-- MODAL PRINT SALES ORDER -->
-<?php foreach($all as $row): ?>
- <div class="modal" id="modal_print<?php echo $row->No_So;?>" tabindex="-1" role="dialog" aria-labelledby="largeModal" aria-hidden="true">
-      <div class="modal-dialog">
-      <div class="modal-content">
-      <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-          <h3 class="modal-title" id="myModalLabel">Print Sales Order <?php echo $row->No_So;?></h3>
-      </div>
-      <form class="form-horizontal" method="post" action="<?php echo base_url('transaksi/salesorder/cetak')?>">
-          <div class="modal-body">
-              <p><h2>Siapkan printer dan kertas</h2></p>
-              <p>Karena setelah proses print selesai data tidak bisa diprint ulang</p>
-              <p>Apakah printer sudah siap ?</p>            
-          </div>
-          <div class="modal-footer">
-              <input type="hidden" name="txt_no_so" value="<?php echo $row->No_So;?>" >
-              <button class="btn" data-dismiss="modal" aria-hidden="true">Tutup</button>
-              <button class="btn btn-danger">Print</button>
-          </div>
-      </form>
-      </div>
-      </div>
-</div>   
-<?php endforeach; ?>    
-<!-- END MODAL PRINT SALES ORDER -->
+

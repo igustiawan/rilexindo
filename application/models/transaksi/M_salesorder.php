@@ -98,6 +98,26 @@ class M_salesorder extends CI_Model {
 		return $result; 
     }
 
+	public function getOrdersData($id)
+	{
+        $this->db->select('a.No_So,a.Nm_Cust,a.Alamat,b.No_Mesin,a.Jns_Bayar,a.By_Tunai,a.Ttl_Hrg_Otr,
+                            a.Tenor,a.Angsuran,b.Diskon,d.Tipe,e.Warna,a.Bunga,a.Kd_Cust,a.Tgl_So,a.Kd_Fincoy,
+                            a.ADM,f.Nm_Cust as Nm_Fincoy,a.DP,
+                            case when a.Jns_Bayar = '."'Tunai'".' then a.By_Tunai when a.Jns_Bayar =  '."'Kredit'".' 
+                            then a.Ttl_Hrg_Otr end as Hrg_Jual,c.No_Polisi,g.Pekerjaan,g.Telepon,c.No_Chassis,c.No_Mesin,b.Diskon');
+        $this->db->where('a.No_So', $id);
+        $this->db->join('tb_so_detail b','a.No_So = b.Fk_So');
+        $this->db->join('tb_stock c','b.No_Mesin = c.No_Mesin');
+        $this->db->join('tb_tipe d','d.Kd_Tipe = c.Kd_Tipe');
+        $this->db->join('tb_warna e','e.Kd_Warna = c.Kd_Warna');
+        $this->db->join('tb_customer f','f.Kd_Cust = a.Kd_Fincoy', 'left');
+        $this->db->join('tb_customer g','g.Kd_Cust = a.Kd_Cust', 'left');
+        $result = $this->db->get('tb_so a')->row_array(); 		
+        return $result; 
+	}
+
+
+    
     public function ambilDataSalesOrder(){	
         $this->db->select('a.No_So,a.Nm_Cust,a.Alamat,b.No_Mesin,a.Jns_Bayar,a.By_Tunai,a.Ttl_Hrg_Otr,
                           a.Tenor,a.Angsuran,b.Diskon,d.Tipe,e.Warna,a.Bunga,a.Kd_Cust,a.Tgl_So,a.Kd_Fincoy,
@@ -237,15 +257,6 @@ class M_salesorder extends CI_Model {
         }
     }
 
-    function printsalesorder(){   
-        $No_So=$this->input->post('txt_no_so'); 
-        $this->db->query("update tb_so set Cetak= '1' where No_So = '$No_So'");     
-        if($this->db->affected_rows() > 0){
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
+ 
 
 }

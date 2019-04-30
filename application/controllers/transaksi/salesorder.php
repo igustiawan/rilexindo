@@ -76,8 +76,10 @@ class Salesorder extends CI_Controller {
 			}elseif ($field->Status=="Approved" && $field->Cetak=="0" ){   
 				$row[]='<span class="label label-info">Approved</span>';	
 				$row[]=
-				'<a class="btn btn-primary btn-xs" data-toggle="modal" data-target="#modal_print'.$field->No_So.'" title="Print" rel="tooltip"><i class="fa fa-print"></i></a>			
-				';				
+				//'<a class="btn btn-primary btn-xs" data-toggle="modal" data-target="#modal_print'.$field->No_So.'" title="Print" rel="tooltip"><i class="fa fa-print"></i></a>			
+				//'<a href="'.base_url().'transaksi/salesorder/cetak/'.$field->No_So.'" target="_blank" class="btn btn-primary btn-xs" id="Cetaks" title="Print" rel="tooltip"><i class="fa fa-print"></i></a>'
+				'<a target="__blank" href="'.base_url('transaksi/salesorder/cetak/'.$field->No_So).'" class="btn btn-default btn-sm"><i class="fa fa-print"></i></a>'
+				;				
 			}elseif ($field->Status=="Approved" && $field->Cetak=="1" && $field->Status_Bast=="0" ){   
 				$row[]='<span class="label label-info">Approved</span>';	
 				$row[]=
@@ -174,15 +176,106 @@ class Salesorder extends CI_Controller {
         redirect(base_url('transaksi/salesorder'));
 	}
 
-	function cetak(){
-		$hasil = $this->salesorder->printsalesorder();
-        if($hasil){
-            $this->session->set_flashdata('psn_sukses','Data telah disimpan');
-        }
-        else {
-            $this->session->set_flashdata('psn_error','Gagal menyimpan data ');
-        }
-        redirect(base_url('transaksi/salesorder'));
+	public function cetak($id)
+	{
+	
+		
+		$order_data = $this->salesorder->getOrdersData($id);
+
+		$this->db->query("update tb_so set Cetak= '1' where No_So = '".$order_data['No_So']."'"); 
+
+
+		$this->load->library('cfpdf');		
+		$pdf = new FPDF('P','mm','letter');
+		$pdf->AddPage();
+		$pdf->SetFont('Arial','',10);	
+	
+		$pdf->Cell(110, 14, $order_data['No_So'], 0, 0, 'R');
+		$pdf->Ln();
+
+		$pdf->SetX(20);
+		$pdf->Cell(110, 6, $order_data['Nm_Cust'], 0, 0, 'L'); 
+		$pdf->Cell(85, 6,  $order_data['Pekerjaan'], 0, 0, 'L');
+		$pdf->Ln();
+
+		$pdf->SetX(20);
+		$pdf->Cell(80, 6,  $order_data['No_Polisi'], 0, 0, 'L');
+
+		$pdf->Ln();
+
+		$pdf->SetX(130);
+		$pdf->Cell(20, 6,  $order_data['Alamat'], 0, 0, 'L');	
+
+		$pdf->Ln();
+		$pdf->SetX(130);
+		$pdf->Cell(20, 6,  $order_data['Telepon'], 0, 0, 'L');	
+
+		$pdf->Ln();
+		$pdf->Ln();
+		$pdf->Ln();
+		$pdf->Ln();
+
+		$pdf->SetX(20);
+		$pdf->Cell(60, 6,  $order_data['Tipe'], 0, 0, 'L');	
+		$pdf->Cell(30, 6,  1, 0, 0, 'L');	
+		$pdf->Cell(50, 6,  'Rp.' . ' ' . number_format($order_data['Hrg_Jual']), 0, 0, 'L');	
+		$pdf->Cell(30, 6,  'Rp.' . ' ' . number_format($order_data['Hrg_Jual']), 0, 0, 'L');	
+
+		$pdf->Ln();
+		$pdf->SetX(20);
+		$pdf->Cell(55, 6,  $order_data['Warna'], 0, 0, 'L');
+		$pdf->Cell(35, 6,  'Discount', 0, 0, 'L');	
+		
+		$pdf->Cell(30, 6,  'Rp.' . ' ' . number_format($order_data['Diskon']), 0, 0, 'L');	
+
+		$pdf->Ln();
+		$pdf->SetX(20);
+		$pdf->Cell(57, 6,  $order_data['No_Chassis'], 0, 0, 'L');	
+		$pdf->Cell(33, 6,  'Netto', 0, 0, 'L');	
+		$pdf->Cell(30, 6,  'Rp.' . ' ' . number_format($order_data['Hrg_Jual']+$order_data['Diskon']), 0, 0, 'L');	
+
+		$pdf->Ln();
+		$pdf->SetX(20);
+		$pdf->Cell(80, 6,  $order_data['No_Mesin'], 0, 0, 'L');	
+
+		$pdf->Ln();
+		$pdf->Ln();
+		$pdf->Ln();
+		$pdf->Ln();
+		$pdf->Ln();
+		$pdf->Ln();
+		
+		$pdf->Ln();
+		$pdf->SetX(160);
+		$pdf->Cell(30, 6,  'Rp.' . ' ' . number_format($order_data['Hrg_Jual']+$order_data['Diskon']), 0, 0, 'L');	
+
+		$pdf->Ln();
+		$pdf->Ln();
+		$pdf->Ln();
+
+		$pdf->SetX(25);
+		$pdf->Cell(30, 6,  number_format($order_data['Hrg_Jual']+$order_data['Diskon']), 0, 0, 'L');	
+
+		$pdf->Ln();
+		$pdf->SetX(25);
+		$pdf->Cell(30, 6,  number_format($order_data['Hrg_Jual']+$order_data['Diskon']), 0, 0, 'L');	
+
+		$pdf->Ln();
+		$pdf->SetX(25);
+		$pdf->Cell(30, 6,  number_format($order_data['DP']), 0, 0, 'L');
+
+		$pdf->Ln();
+		$pdf->SetX(25);
+		$pdf->Cell(30, 6,  number_format($order_data['ADM']), 0, 0, 'L');	
+
+		$pdf->Ln();
+		$pdf->SetX(25);
+		$pdf->Cell(60, 6,  number_format($order_data['Angsuran']), 0, 0, 'L');	
+		$pdf->Cell(30, 6,  number_format($order_data['Tenor']), 0, 0, 'L');
+
+		$pdf->Output();
+
+
 	}
 
 }
