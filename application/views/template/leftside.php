@@ -41,6 +41,7 @@
             <li><a href="<?php echo base_url() .'master/customer';?>"><i class="fa fa-circle-o"></i> Data Customer</a></li>          
             <li><a href="<?php echo base_url() .'master/salesman';?>"><i class="fa fa-circle-o"></i> Data Salesman</a></li>
             <li><a href="<?php echo base_url() .'master/leasing';?>"><i class="fa fa-circle-o"></i> Data Leasing (Finco)</a></li>
+            <li><a href="<?php echo base_url() .'master/stokunit';?>"><i class="fa fa-circle-o"></i> Stok Unit</a></li>
          </ul>
         </li>
         <li class="treeview">

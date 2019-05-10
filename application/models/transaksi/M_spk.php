@@ -96,64 +96,99 @@ class M_spk extends CI_Model {
         return $kd;
     }
     
-    function simpanDataSpk(){
+    function insert_transaksi_spk($datepicker, $txt_kd_cust, $txt_cust, $txt_alamat, 
+            $kd_salesman, $txt_jns_pembayaran, $txt_kd_merek,
+            $txt_kd_tipe, $txt_kd_warna, $txt_harga_kendaraan, $txt_uang_muka, 
+            $txt_angsuran, $kd_leasing,$txt_tenor,$txt_bunga,$txt_jns_angsuran,$Status,$Cetak,
+            $txt_jns_road,$optJnsKel,$txt_nomesin)
+    {
+        $kd = $this->idSpk();          
+		$dt = array(
+			'No_Spk'=> $kd,
+            'Tgl_Spk'=> $datepicker,
+            'Kd_Cust'=> $txt_kd_cust,
+            'Nm_Cust'=> $txt_cust,
+            'Alamat'=> $txt_alamat,
+            'Kd_Salesman'=> $kd_salesman,
+            'Jns_Bayar'=> $txt_jns_pembayaran,
+            'Kd_Merek'=> $txt_kd_merek,
+            'Kd_Tipe'=> $txt_kd_tipe,
+            'Kd_Warna'=> $txt_kd_warna,
+            'Jml_Harga'=> $txt_harga_kendaraan,
+            'Uang_Muka'=> $txt_uang_muka,
+            'Angsuran'=> $txt_angsuran,
+            'Kd_Fincoy'=> $kd_leasing,
+            'Tenor'=> $txt_tenor,
+            'P_Bunga'=> $txt_bunga,
+            'Tipe_Angs'=> $txt_jns_angsuran,
+            'Status'=> "Waiting Process",
+            'Cetak'=> "0",
+            'Stat_OTR'=> $txt_jns_road,
+            'Jns_Kel'=> $optJnsKel,
+            'No_Mesin'=> $txt_nomesin
+		);
 
-        $kd = $this->idSpk();
-        $Tgl_Spk = $this->input->post('txt_tgl_spk');
-        $Kd_Cust = $this->input->post('txt_kd_cust');
-        $Nm_Cust = $this->input->post('txt_cust');
-        $Alamat = $this->input->post('txt_alamat');
-        $Kd_Salesman = $this->input->post('kd_salesman');
-        $Jns_Bayar = $this->input->post('txt_jns_pembayaran');
-        $Kd_Merek = $this->input->post('txt_kd_merek');
-        $Kd_Tipe = $this->input->post('txt_kd_tipe');
-        $Kd_Warna = $this->input->post('txt_kd_warna');
-        $Jml_Harga = $this->input->post('txt_harga_kendaraan');  
-        $Uang_Muka = $this->input->post('txt_uang_muka');  
-        $Angsuran = $this->input->post('txt_angsuran'); 
-        $Kd_Fincoy = $this->input->post('kd_leasing'); 
-        $Tenor = $this->input->post('txt_tenor'); 
-        $P_Bunga = $this->input->post('txt_bunga'); 
-        $Tipe_Angs = $this->input->post('txt_jns_angsuran'); 
-        $Status = "Waiting Process"; 
-        $Cetak = "0";
-        $Stat_OTR = $this->input->post('txt_jns_road'); 
-        $Jns_Kel = $this->input->post('opt_jnskel'); 
-        $No_Mesin = $this->input->post('txt_nomesin'); 
+		return $this->db->insert('tb_spk', $dt);
 
-		$data = array(
-            'No_Spk'=> $kd,
-            'Tgl_Spk'=> $Tgl_Spk,
-            'Kd_Cust'=> $Kd_Cust,
-            'Nm_Cust'=> $Nm_Cust,
-            'Alamat'=> $Alamat,
-            'Kd_Salesman'=> $Kd_Salesman,
-            'Jns_Bayar'=> $Jns_Bayar,
-            'Kd_Merek'=> $Kd_Merek,
-            'Kd_Tipe'=> $Kd_Tipe,
-            'Kd_Warna'=> $Kd_Warna,
-            'Jml_Harga'=> $Jml_Harga,
-            'Uang_Muka'=> $Uang_Muka,
-            'Angsuran'=> $Angsuran,
-            'Kd_Fincoy'=> $Kd_Fincoy,
-            'Tenor'=> $Tenor,
-            'P_Bunga'=> $P_Bunga,
-            'Tipe_Angs'=> $Tipe_Angs,
-            'Status'=> $Status,
-            'Cetak'=> $Cetak,
-            'Stat_OTR'=> $Stat_OTR,
-            'Jns_Kel'=> $Jns_Kel,
-            'No_Mesin'=> $No_Mesin
-			);
-
-        $this->db->insert('tb_spk', $data);
-        if($this->db->affected_rows() > 0){
-            return true;
-        }
-        else {
-            return false;
-        }
     }
+    // function simpanDataSpk(){
+
+    //     $kd = $this->idSpk();
+    //     $Tgl_Spk = $this->input->post('txt_tgl_spk');
+    //     $Kd_Cust = $this->input->post('txt_kd_cust');
+    //     $Nm_Cust = $this->input->post('txt_cust');
+    //     $Alamat = $this->input->post('txt_alamat');
+    //     $Kd_Salesman = $this->input->post('kd_salesman');
+    //     $Jns_Bayar = $this->input->post('txt_jns_pembayaran');
+    //     $Kd_Merek = $this->input->post('txt_kd_merek');
+    //     $Kd_Tipe = $this->input->post('txt_kd_tipe');
+    //     $Kd_Warna = $this->input->post('txt_kd_warna');
+    //     $Jml_Harga = $this->input->post('txt_harga_kendaraan');  
+    //     $Uang_Muka = $this->input->post('txt_uang_muka');  
+    //     $Angsuran = $this->input->post('txt_angsuran'); 
+    //     $Kd_Fincoy = $this->input->post('kd_leasing'); 
+    //     $Tenor = $this->input->post('txt_tenor'); 
+    //     $P_Bunga = $this->input->post('txt_bunga'); 
+    //     $Tipe_Angs = $this->input->post('txt_jns_angsuran'); 
+    //     $Status = "Waiting Process"; 
+    //     $Cetak = "0";
+    //     $Stat_OTR = $this->input->post('txt_jns_road'); 
+    //     $Jns_Kel = $this->input->post('opt_jnskel'); 
+    //     $No_Mesin = $this->input->post('txt_nomesin'); 
+
+	// 	$data = array(
+    //         'No_Spk'=> $kd,
+    //         'Tgl_Spk'=> $Tgl_Spk,
+    //         'Kd_Cust'=> $Kd_Cust,
+    //         'Nm_Cust'=> $Nm_Cust,
+    //         'Alamat'=> $Alamat,
+    //         'Kd_Salesman'=> $Kd_Salesman,
+    //         'Jns_Bayar'=> $Jns_Bayar,
+    //         'Kd_Merek'=> $Kd_Merek,
+    //         'Kd_Tipe'=> $Kd_Tipe,
+    //         'Kd_Warna'=> $Kd_Warna,
+    //         'Jml_Harga'=> $Jml_Harga,
+    //         'Uang_Muka'=> $Uang_Muka,
+    //         'Angsuran'=> $Angsuran,
+    //         'Kd_Fincoy'=> $Kd_Fincoy,
+    //         'Tenor'=> $Tenor,
+    //         'P_Bunga'=> $P_Bunga,
+    //         'Tipe_Angs'=> $Tipe_Angs,
+    //         'Status'=> $Status,
+    //         'Cetak'=> $Cetak,
+    //         'Stat_OTR'=> $Stat_OTR,
+    //         'Jns_Kel'=> $Jns_Kel,
+    //         'No_Mesin'=> $No_Mesin
+	// 		);
+
+    //     $this->db->insert('tb_spk', $data);
+    //     if($this->db->affected_rows() > 0){
+    //         return true;
+    //     }
+    //     else {
+    //         return false;
+    //     }
+    // }
 
     function get_list_spk(){ 
         $query = $this->db->query("select * from tb_spk where Status = 'Process' and No_Spk not in (select no_spk from tb_so where status !='Batal')");

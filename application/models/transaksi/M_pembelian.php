@@ -99,78 +99,68 @@ class M_pembelian extends CI_Model {
         return "TR".$tahun.$bulan.$kd;
     }
 
-    function simpanDataPembelian(){
-        $this->db->trans_begin();
-        $kd = $this->idPembelian();
- 		$Nm_Penjual = $this->input->post('txt_nm_penjual');
-
-        $Tgl_Beli = $this->input->post('txt_tgl_beli');
-        $Alamat = $this->input->post('txt_alamat');
-        $JnsKel = $this->input->post('opt_jnskel');
-        $Kd_Tipe = $this->input->post('kd_tipe');
-        $Kd_Warna = $this->input->post('kd_warna');
-        $merek = $this->input->post('kd_merek');
-        $Kapasitas = $this->input->post('txt_kapasitas');
-        $No_Polisi = $this->input->post('txt_no_polisi');
-        $No_Chassis = $this->input->post('txt_no_rangka');
-        $No_Mesin = $this->input->post('txt_no_mesin');
-        $Tgl_Stnk = $this->input->post('txt_tgl_stnk');
-        $Ongkir = $this->input->post('txt_ongkir');
-        $Thn_Produksi = $this->input->post('txt_thn_produksi');
-        $No_Stnk = $this->input->post('txt_no_stnk');
-        $No_Bpkb = $this->input->post('txt_no_bpkb');
-        $Nm_Stnk = $this->input->post('txt_nm_stnk');
-
-		$data = array(
-			'No_Transaksi'=> $kd,
-            'Nm_Penjual' => $Nm_Penjual,
-            'Tgl_Beli' => $Tgl_Beli,
-            'Alamat' => $Alamat,
-            'JnsKel' => $JnsKel,
-            'Kd_Tipe' => $Kd_Tipe,
-            'Kd_Warna' => $Kd_Warna,
-            'Kd_Merek' => $merek,
-            'Kapasitas' => $Kapasitas,
-            'No_Polisi' => $No_Polisi,
-            'No_Chassis' => $No_Chassis,
-            'No_Mesin' => $No_Mesin,
-            'Tgl_Stnk' => $Tgl_Stnk,
-            'Ongkir' => $Ongkir,
-            'Thn_Produksi' => $Thn_Produksi,
-            'No_Stnk' => $No_Stnk,
-            'No_Bpkb' => $No_Bpkb,
-            'Nm_Stnk' => $Nm_Stnk,
-			);
-
-        $this->db->insert('tb_pembelian', $data);
-
-        
-        $data_stock = array(
-            'No_Mesin' => $No_Mesin,
-            'No_Chassis' => $No_Chassis,
-            'Kd_Tipe' => $Kd_Tipe,
-            'Kd_Warna' => $Kd_Warna,
-            'Status' => "Received",
-            'Kd_Merek' => $merek,
-            'Kapasitas' => $Kapasitas,
-            'Thn_Produksi' => $Thn_Produksi,
-            'No_Polisi' => $No_Polisi,
-            'Tgl_Beli' => $Tgl_Beli,
-            'Ongkir' => $Ongkir,
-            'No_Stnk' => $No_Stnk,
-            'No_Bpkb' => $No_Bpkb,
-            'Nm_Stnk' => $Nm_Stnk,
-            'Tgl_Stnk' => $Tgl_Stnk   
-            );
-        $this->db->insert('tb_stock', $data_stock); 
-   
-        if($this->db->affected_rows() > 0){
-            $this->db->trans_commit();
-            return true;
-        }
-        else {
-            $this->db->trans_rollback();
-            return false;
-        }
+    function cek_nosin_validasi($nomesin)
+	{
+		return $this->db->select('No_Mesin')->where('No_Mesin', $nomesin)->limit(1)->get('tb_stock');
     }
+    
+    function insert_transaksi_pembelian($txt_nm_penjual, $optJnsKel, $txt_alamat, $kd_tipe, 
+                        $kd_merek, $kd_warna, $txt_no_polisi, $txt_no_bpkb, 
+                        $txt_nm_stnk, $txt_no_rangka, $txt_no_mesin, $txt_kapasitas, 
+                        $txt_thn_produksi, $txt_ongkir,$txt_tgl_beli,$txt_tgl_stnk,
+                        $txt_no_stnk)
+	{
+        $kd = $this->idPembelian();
+
+		$dt = array(
+			'No_Transaksi'=> $kd,
+            'Nm_Penjual' => $txt_nm_penjual,
+            'Tgl_Beli' => $txt_tgl_beli,
+            'Alamat' => $txt_alamat,
+            'JnsKel' => $optJnsKel,
+            'Kd_Tipe' => $kd_tipe,
+            'Kd_Warna' => $kd_warna,
+            'Kd_Merek' => $kd_merek,
+            'Kapasitas' => $txt_kapasitas,
+            'No_Polisi' => $txt_no_polisi,
+            'No_Chassis' => $txt_no_rangka,
+            'No_Mesin' => $txt_no_mesin,
+            'Tgl_Stnk' => $txt_tgl_stnk,
+            'Ongkir' => $txt_ongkir,
+            'Thn_Produksi' => $txt_thn_produksi,
+            'No_Stnk' => $txt_no_stnk,
+            'No_Bpkb' => $txt_no_bpkb,
+            'Nm_Stnk' => $txt_nm_stnk
+		);
+
+		return $this->db->insert('tb_pembelian', $dt);
+    }
+    
+    function insert_stok($txt_no_mesin, $txt_no_rangka, $kd_tipe, $kd_warna, 
+                        $kd_merek, $txt_kapasitas, $txt_thn_produksi, $txt_no_polisi, 
+                        $txt_tgl_beli, $txt_ongkir, $txt_no_stnk,$txt_no_bpkb, 
+                        $txt_nm_stnk, $txt_tgl_stnk)
+    {
+   
+        $data_stock = array(
+        'No_Mesin' => $txt_no_mesin,
+        'No_Chassis' => $txt_no_rangka,
+        'Kd_Tipe' => $kd_tipe,
+        'Kd_Warna' => $kd_warna,
+        'Status' => "Received",
+        'Kd_Merek' => $kd_merek,
+        'Kapasitas' => $txt_kapasitas,
+        'Thn_Produksi' => $txt_thn_produksi,
+        'No_Polisi' => $txt_no_polisi,
+        'Tgl_Beli' => $txt_tgl_beli,
+        'Ongkir' => $txt_ongkir,
+        'No_Stnk' => $txt_no_stnk,
+        'No_Bpkb' => $txt_no_bpkb,
+        'Nm_Stnk' => $txt_nm_stnk,
+        'Tgl_Stnk' => $txt_tgl_stnk   
+        );
+
+        return $this->db->insert('tb_stock', $data_stock);
+    }
+
 }

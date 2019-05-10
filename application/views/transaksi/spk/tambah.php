@@ -20,19 +20,19 @@
 
   <section class="content">
         <!-- Default box -->
-        <form action="<?php echo base_url('transaksi/spk/simpan')?>" method="post" class="form-horizontal">
-            
+        <!-- <form action="<?php echo base_url('transaksi/spk/simpan')?>" method="post" class="form-horizontal"> -->
+                <div class="form-horizontal">
                 <div class="box">
                     <div class="box-header with-border">
                     </div>
                 <div class="box-body"> 
-
+                    <!-- 
                     <?php if (validation_errors()) : ?>
                     <div class="alert alert-warning alert-dismissible">
                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                     <?php echo validation_errors(); ?>
                     </div>
-                    <?php endif; ?>
+                    <?php endif; ?> -->
 
                     <div class="row">         
                         <div class="form-group ">                           
@@ -54,7 +54,7 @@
                             <label for="dari" class="col-md-2 control-label">Jenis Kelamin</label>
                             <div class="col-md-4 col-sm-12 ">
                                 <select class="form-control"  name="opt_jnskel" id="optJnsKel">
-                                    <option>Pilih Jenis Kelamin...</option>
+                                    <option value="">Pilih Jenis Kelamin...</option>
                                     <option value='L'>Laki-Laki</option>
                                     <option value='P'>Perempuan</option>
                                 </select>
@@ -78,8 +78,8 @@
                         <div class="form-group">
                             <label for="dari" class="col-md-2 control-label">Tipe Customer</label>
                             <div class="col-md-7 col-sm-12 "> 
-                                <label class="radio-inline"><input type="radio" value=0 name="txt_tipe_customer" checked>Perorangan</label>
-                                <label class="radio-inline"><input type="radio" value=1 name="txt_tipe_customer">Fleet</label>
+                                <label class="radio-inline"><input type="radio" value=0 name="txt_tipe_customer" id="txt_tipe_customer" checked>Perorangan</label>
+                                <label class="radio-inline"><input type="radio" value=1 name="txt_tipe_customer" id="txt_tipe_customer">Fleet</label>
                             </div>
                         </div>                
                         <div class="form-group ">
@@ -186,13 +186,6 @@
                                 <label class="radio-inline"><input type="radio" value=0 checked name="txt_jns_road">Off the Road</label>
                                 <label class="radio-inline"><input type="radio" value=1 name="txt_jns_road">On the Road</label>
                             </div>
-                            <!-- <label for="dari" class="col-md-2 control-label">Pinjaman</label>
-                            <div class="col-md-4 col-sm-12 ">                      
-                                <div class="input-group">
-                                <span class="input-group-addon">Rp</span>
-                                <input type="text" readonly maxlength="30" value=0 class="form-control" id="txt_pinjaman" name="txt_pinjaman" > 
-                                </div>                              
-                            </div> -->
                             <label for="dari" class="col-md-1 control-label">Bunga</label>
                             <div class="col-md-3 col-sm-12 ">
                                     <input type="text" readonly maxlength="2" value=0  onkeypress="return hanyaAngka(event)" class="form-control" id="txt_bunga" name="txt_bunga" >                       
@@ -217,11 +210,11 @@
                         </div> 
                         <div class="box-footer text-right">
                             <a class="btn btn-default" href="<?php echo base_url('transaksi/spk/tambah')?>"><i class="fa fa-close"></i> Batal</a>
-                            <button type="submit" name="btnSimpan" class="btn btn-success"><i class="fa fa-check icon-white"></i> Simpan</button>
+                            <button type="submit"  id='Simpann' name="btnSimpan" class="btn btn-success"><i class="fa fa-check icon-white"></i> Simpan</button>
                         </div>
                     </div>          
                 </div>               
-         </form>
+                </div>
     </section>
 
 </div>
@@ -249,18 +242,25 @@
                         </thead>                                
                     </table>  
             </div>
+            <div class="modal-footer">
+                 <button class="btn btn-primary pull-right"  type="button" id="btn-reload"><i class="fa fa-refresh"></i> Reload</button> 
+            </div>
         </div>
     </div>
 </div>
+
 
 <div class="modal" id="modalCust" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog" style="width:770px">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+               
                 <h4 class="modal-title" id="myModalLabel">List Customer</h4>
             </div>
+
             <div class="modal-body">
+                                       
                     <table style="width:100%" id="tblcust" class="table table-bordered table-hover table-striped">
                         <thead>
                             <tr>
@@ -273,11 +273,13 @@
                     </table>  
             </div>            
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary">Add New</button>
+                 <button class="btn btn-primary pull-right"  type="button" id="btn-reload"><i class="fa fa-refresh"></i> Reload</button> 
             </div>
         </div>
     </div>
 </div>
+
+
 <script>
 $(document).ready(function() {
 	  $("#tunai").click(function() {
@@ -332,7 +334,10 @@ $(document).ready(function() {
             }
            
         }); 
-       
+        $('#btn-reload').on('click', function(){
+            table_stock.ajax.reload();
+        });
+
     });
 
     $(document).on('click', '.pilih_stock', function (e) {
@@ -356,9 +361,11 @@ $(document).ready(function() {
        $('#modalStock').modal('hide');
     });
 
+
+
     var table_cust;
     $(document).ready(function() {
-        //datatables
+       //datatables
         table_cust = $('#tblcust').DataTable({ 
             "processing": true, 
             "serverSide": true, 
@@ -379,6 +386,12 @@ $(document).ready(function() {
             return nRow;
             }
         }); 
+        
+      
+        $('#btn-reload').on('click', function(){
+                table_cust.ajax.reload();
+        });
+
     });
 
     $(document).on('click', '.pilih_cust', function (e) {
@@ -391,7 +404,70 @@ $(document).ready(function() {
              $('#modalCust').modal('hide');
     });
 
+    $(document).on('click', '#Simpann', function(){
+        $('.modal-dialog').removeClass('modal-lg');
+        $('.modal-dialog').addClass('modal-sm');
+        $('#ModalHeader').html('Konfirmasi');
+        $('#ModalContent').html("Apakah anda yakin ingin menyimpan transaksi ini ?");
+        $('#ModalFooter').html("<button type='button' class='btn btn-primary' id='SimpanTransaksi'>Ya, saya yakin</button><button type='button' class='btn btn-default' data-dismiss='modal'>Batal</button>");
+        $('#ModalGue').modal('show');
 
+        setTimeout(function(){ 
+            $('button#SimpanTransaksi').focus();
+        }, 500);
+    });
+
+    $(document).on('click', 'button#SimpanTransaksi', function(){
+        SimpanTransaksi();
+    });
+
+    function SimpanTransaksi()
+    {
+        var FormData = "txt_kd_cust="+encodeURI($('#txt_kd_cust').val());
+        FormData += "&txt_cust="+encodeURI($('#txt_cust').val());
+        FormData += "&optJnsKel="+encodeURI($('#optJnsKel').val());
+        FormData += "&datepicker="+$('#datepicker').val();
+        FormData += "&txt_alamat="+$('#txt_alamat').val();
+        FormData += "&txt_tipe_customer="+ $('input:radio[name=txt_tipe_customer]:checked').val();
+        FormData += "&kd_salesman="+$('#kd_salesman').val();
+        FormData += "&txt_nomesin="+$('#txt_nomesin').val();
+        FormData += "&txt_kd_merek="+$('#txt_kd_merek').val();
+        FormData += "&txt_kd_tipe="+$('#txt_kd_tipe').val();
+        FormData += "&txt_kd_warna="+$('#txt_kd_warna').val();
+        FormData += "&txt_jns_pembayaran="+ $('input:radio[name=txt_jns_pembayaran]:checked').val();
+        FormData += "&txt_harga_kendaraan="+$('#txt_harga_kendaraan').val();
+        FormData += "&kd_leasing="+$('#kd_leasing').val();
+        FormData += "&txt_uang_muka="+$('#txt_uang_muka').val();
+        FormData += "&txt_jns_road="+ $('input:radio[name=txt_jns_road]:checked').val();
+        FormData += "&txt_bunga="+$('#txt_bunga').val();
+        FormData += "&txt_tenor="+$('#txt_tenor').val();
+        FormData += "&txt_angsuran="+$('#txt_angsuran').val();
+        FormData += "&txt_jns_angsuran="+ $('input:radio[name=txt_jns_angsuran]:checked').val();
+
+        $.ajax({
+            url: "<?php echo base_url('transaksi/spk/simpan'); ?>",
+            type: "POST",
+            cache: false,
+            data: FormData,
+            dataType:'json',
+            success: function(data){
+                if(data.status == 1)
+                {
+                    alert(data.pesan);
+                    window.location.href="<?php echo site_url('transaksi/spk'); ?>";
+                }
+                else 
+                {
+                    $('.modal-dialog').removeClass('modal-lg');
+                    $('.modal-dialog').addClass('modal-sm');
+                    $('#ModalHeader').html('Oops !');
+                    $('#ModalContent').html(data.pesan);
+                    $('#ModalFooter').html("<button type='button' class='btn btn-primary' data-dismiss='modal' autofocus>Ok</button>");
+                    $('#ModalGue').modal('show');
+                }	
+            }
+        });
+    }
 
 </script>
 
