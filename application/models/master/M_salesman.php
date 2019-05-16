@@ -94,6 +94,13 @@ class M_salesman extends CI_Model {
         }
     }
 
+    public function getActiveSalesman()
+	{
+		$sql = "SELECT * FROM tb_salesman WHERE Status = ?";
+		$query = $this->db->query($sql, array('A'));
+		return $query->result_array();
+    }
+    
     function ambilDataSalesmanbyID($id){
         $this->db->where('Kd_Salesman', $id);
         $query = $this->db->get('tb_salesman');

@@ -75,13 +75,13 @@
                             <textarea   maxlength="100" class="form-control" value="<?php echo isset($_POST["Alamat"]) ? $_POST["Alamat"] : ''; ?>" id="txt_alamat" name="txt_alamat" ></textarea>
                             </div>
                         </div>
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label for="dari" class="col-md-2 control-label">Tipe Customer</label>
                             <div class="col-md-7 col-sm-12 "> 
                                 <label class="radio-inline"><input type="radio" value=0 name="txt_tipe_customer" id="txt_tipe_customer" checked>Perorangan</label>
                                 <label class="radio-inline"><input type="radio" value=1 name="txt_tipe_customer" id="txt_tipe_customer">Fleet</label>
                             </div>
-                        </div>                
+                        </div>                 -->
                         <div class="form-group ">
                             <label for="dari" class="col-md-2 control-label">Salesman</label>
                             <div class="col-md-4 col-sm-12 ">
@@ -156,7 +156,7 @@
                             <label for="dari" class="col-md-1 control-label">Leasing</label>
                             <div class="col-md-4 col-sm-12 ">
                                 <select disabled class="form-control select2"  name="kd_leasing" id="kd_leasing">
-                                        <option></option>
+                                        <option value=""></option>
                                         <?php
                                         if($d_leasing){
                                         foreach($d_leasing as $d){
@@ -428,7 +428,6 @@ $(document).ready(function() {
         FormData += "&optJnsKel="+encodeURI($('#optJnsKel').val());
         FormData += "&datepicker="+$('#datepicker').val();
         FormData += "&txt_alamat="+$('#txt_alamat').val();
-        FormData += "&txt_tipe_customer="+ $('input:radio[name=txt_tipe_customer]:checked').val();
         FormData += "&kd_salesman="+$('#kd_salesman').val();
         FormData += "&txt_nomesin="+$('#txt_nomesin').val();
         FormData += "&txt_kd_merek="+$('#txt_kd_merek').val();

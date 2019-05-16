@@ -103,6 +103,14 @@ $('#datepickerNow').datepicker('setDate', 'today');
 $('#datepicker').datepicker('setDate', 'today');
 $('#datepicker2').datepicker('setDate', 'today');
 
+
+$('#datepickeredit').datepicker({
+  autoclose: false,
+  locale: 'no',
+  format: 'yyyy-mm-dd',
+})
+
+
 $('#txt_tanggal_ku').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' })
 $('#txt_tanggal_bg').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' })
 

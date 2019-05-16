@@ -97,10 +97,10 @@ class M_spk extends CI_Model {
     }
     
     function insert_transaksi_spk($datepicker, $txt_kd_cust, $txt_cust, $txt_alamat, 
-            $kd_salesman, $txt_jns_pembayaran, $txt_kd_merek,
-            $txt_kd_tipe, $txt_kd_warna, $txt_harga_kendaraan, $txt_uang_muka, 
-            $txt_angsuran, $kd_leasing,$txt_tenor,$txt_bunga,$txt_jns_angsuran,$Status,$Cetak,
-            $txt_jns_road,$optJnsKel,$txt_nomesin)
+            $kd_salesman, $txt_jns_pembayaran, $txt_kd_merek,$txt_kd_tipe, 
+            $txt_kd_warna, $txt_harga_kendaraan, $txt_uang_muka,$txt_angsuran, 
+            $kd_leasing,$txt_tenor,$txt_bunga,$txt_jns_angsuran,
+            $Status,$Cetak,$txt_jns_road,$optJnsKel,$txt_nomesin)
     {
         $kd = $this->idSpk();          
 		$dt = array(
@@ -131,64 +131,57 @@ class M_spk extends CI_Model {
 		return $this->db->insert('tb_spk', $dt);
 
     }
-    // function simpanDataSpk(){
 
-    //     $kd = $this->idSpk();
-    //     $Tgl_Spk = $this->input->post('txt_tgl_spk');
-    //     $Kd_Cust = $this->input->post('txt_kd_cust');
-    //     $Nm_Cust = $this->input->post('txt_cust');
-    //     $Alamat = $this->input->post('txt_alamat');
-    //     $Kd_Salesman = $this->input->post('kd_salesman');
-    //     $Jns_Bayar = $this->input->post('txt_jns_pembayaran');
-    //     $Kd_Merek = $this->input->post('txt_kd_merek');
-    //     $Kd_Tipe = $this->input->post('txt_kd_tipe');
-    //     $Kd_Warna = $this->input->post('txt_kd_warna');
-    //     $Jml_Harga = $this->input->post('txt_harga_kendaraan');  
-    //     $Uang_Muka = $this->input->post('txt_uang_muka');  
-    //     $Angsuran = $this->input->post('txt_angsuran'); 
-    //     $Kd_Fincoy = $this->input->post('kd_leasing'); 
-    //     $Tenor = $this->input->post('txt_tenor'); 
-    //     $P_Bunga = $this->input->post('txt_bunga'); 
-    //     $Tipe_Angs = $this->input->post('txt_jns_angsuran'); 
-    //     $Status = "Waiting Process"; 
-    //     $Cetak = "0";
-    //     $Stat_OTR = $this->input->post('txt_jns_road'); 
-    //     $Jns_Kel = $this->input->post('opt_jnskel'); 
-    //     $No_Mesin = $this->input->post('txt_nomesin'); 
+    public function getSpkData($No_Spk = null)
+	{
+		if($No_Spk) {
+			$sql = "SELECT *,b.Merek,C.Tipe,d.Warna 
+            FROM tb_spk a 
+            inner join tb_merek b on a.Kd_Merek = b.Kd_Merek
+            inner join tb_tipe c on a.Kd_Tipe = c.Kd_Tipe 
+            inner join tb_warna d on a.Kd_Warna = d.Kd_Warna
+            WHERE No_Spk = ?";
+			$query = $this->db->query($sql, array($No_Spk));
+			return $query->row_array();
+		}
 
-	// 	$data = array(
-    //         'No_Spk'=> $kd,
-    //         'Tgl_Spk'=> $Tgl_Spk,
-    //         'Kd_Cust'=> $Kd_Cust,
-    //         'Nm_Cust'=> $Nm_Cust,
-    //         'Alamat'=> $Alamat,
-    //         'Kd_Salesman'=> $Kd_Salesman,
-    //         'Jns_Bayar'=> $Jns_Bayar,
-    //         'Kd_Merek'=> $Kd_Merek,
-    //         'Kd_Tipe'=> $Kd_Tipe,
-    //         'Kd_Warna'=> $Kd_Warna,
-    //         'Jml_Harga'=> $Jml_Harga,
-    //         'Uang_Muka'=> $Uang_Muka,
-    //         'Angsuran'=> $Angsuran,
-    //         'Kd_Fincoy'=> $Kd_Fincoy,
-    //         'Tenor'=> $Tenor,
-    //         'P_Bunga'=> $P_Bunga,
-    //         'Tipe_Angs'=> $Tipe_Angs,
-    //         'Status'=> $Status,
-    //         'Cetak'=> $Cetak,
-    //         'Stat_OTR'=> $Stat_OTR,
-    //         'Jns_Kel'=> $Jns_Kel,
-    //         'No_Mesin'=> $No_Mesin
-	// 		);
+		$sql = "SELECT *,b.Merek,C.Tipe,d.Warna 
+        FROM tb_spk a 
+        inner join tb_merek b on a.Kd_Merek = b.Kd_Merek
+        inner join tb_tipe c on a.Kd_Tipe = c.Kd_Tipe 
+        inner join tb_warna d on a.Kd_Warna = d.Kd_Warna
+        ORDER BY No_Spk DESC";
+		$query = $this->db->query($sql);
+		return $query->result_array();
+    }
+    
+    function update_transaksi_spk($No_Spk,$datepicker, $txt_alamat,$kd_salesman, 
+            $txt_jns_pembayaran, $txt_kd_merek,$txt_kd_tipe,$txt_kd_warna, 
+            $txt_harga_kendaraan, $txt_uang_muka,$txt_angsuran,$kd_leasing,
+            $txt_tenor,$txt_bunga,$txt_jns_angsuran,$txt_jns_road,$optJnsKel)
+	{
+		$dt['Tgl_Spk']      = $datepicker;
+		$dt['Alamat']		= $txt_alamat;
+		$dt['Kd_Salesman']	= $kd_salesman;
+		$dt['Jns_Bayar']	= $txt_jns_pembayaran;
+        $dt['Kd_Merek']     = $txt_kd_merek;
+		$dt['Kd_Tipe']		= $txt_kd_tipe;
+		$dt['Kd_Warna']	    = $txt_kd_warna;
+        $dt['Jml_Harga']	= $txt_harga_kendaraan;
+        $dt['Uang_Muka']    = $txt_uang_muka;
+		$dt['Angsuran']		= $txt_angsuran;
+		$dt['Kd_Fincoy']	= $kd_leasing;
+        $dt['Tenor']	    = $txt_tenor;
+        $dt['P_Bunga']      = $txt_bunga;
+		$dt['Tipe_Angs']	= $txt_jns_angsuran;
+		$dt['Stat_OTR']	    = $txt_jns_road;
+		$dt['Jns_Kel']	    = $optJnsKel;
 
-    //     $this->db->insert('tb_spk', $data);
-    //     if($this->db->affected_rows() > 0){
-    //         return true;
-    //     }
-    //     else {
-    //         return false;
-    //     }
-    // }
+		return $this->db
+			->where('No_Spk', $No_Spk)
+			->update('tb_spk', $dt);
+    }
+    
 
     function get_list_spk(){ 
         $query = $this->db->query("select * from tb_spk where Status = 'Process' and No_Spk not in (select no_spk from tb_so where status !='Batal')");
@@ -202,43 +195,32 @@ class M_spk extends CI_Model {
         }
     }
 
-    function prosesDataSpk(){
-        $No_Spk=$this->input->post('txt_no_spk');
-        $No_Mesin=$this->input->post('txt_no_mesin');
-
-        $this->db->query("update tb_spk set status='Process' where No_Spk = '$No_Spk'");
-        $this->db->query("update tb_stock set No_Spk='$No_Spk',Tgl_Book_Spk=now() where No_Mesin = '$No_Mesin'");
-
-        if($this->db->affected_rows() > 0){
-            return true;
-        }
-        else {
-            return false;
-        }
+    function proses_spk($No_Spk)
+	{      
+        $dt['status'] = 'Process';
+        
+		return $this->db
+				->where('No_Spk', $No_Spk)
+                ->update('tb_spk', $dt);                    
     }
 
-    // function role_exists($key)
-    // {
-    //     $this->db->where('No_Mesin',$key);
-    //     $this->db->where('Status != ','Batal',FALSE);
-    //     $query = $this->db->get('tb_spk');
-    //     if ($query->num_rows() > 0){
-    //         return true;
-    //     }
-    //     else{
-    //         return false;
-    //     }
-    // }
+    function update_stok_spk($no_mesin,$No_Spk)
+	{
+        $dt_stok['No_Spk'] = $No_Spk;
+        $dt_stok['Tgl_Book_Spk'] =date('Y-m-d H:i:s');
 
-    function batalspk(){
-        $No_Spk=$this->input->post('txt_no_spk');    
-        $this->db->query("update tb_spk set status='Batal' where No_Spk = '$No_Spk'");     
-        if($this->db->affected_rows() > 0){
-            return true;
-        }
-        else {
-            return false;
-        }
+        return $this->db
+                ->where('No_Mesin', $no_mesin)
+                ->update('tb_stock', $dt_stok);   
+    }
+    
+    function batal_spk($No_Spk)
+	{      
+        $dt['status'] = 'Batal';
+        
+		return $this->db
+				->where('No_Spk', $No_Spk)
+                ->update('tb_spk', $dt);                    
     }
 
 }

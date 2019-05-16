@@ -45,10 +45,10 @@ class Spk extends MY_Controller {
                 $row[] = 
                 '
                 <a href="'.base_url().'transaksi/spk/ubah/'.$field->No_Spk.'" rel="tooltip" class="btn btn-warning btn-xs" title="Ubah"><i class="fa fa-pencil " ></i></a>
-                <a class="btn btn-info btn-xs" data-toggle="modal" data-target="#modal_proses'.$field->No_Spk.'" title="Proses" rel="tooltip"><i class="fa fa-upload" ></i></a>
-                <a class="btn btn-danger btn-xs" data-toggle="modal" data-target="#modal_batal'.$field->No_Spk.'" title="Batal" rel="tooltip"><i class="fa fa-trash" ></i></a>
+                <a class="btn btn-info btn-xs" href="'.base_url().'transaksi/spk/proses/'.$field->No_Spk.'" id="ProsesSpk"><i class="fa fa-upload" ></i></a>
+                <a class="btn btn-danger btn-xs" href="'.base_url().'transaksi/spk/batal/'.$field->No_Spk.'" id="BatalSpk"><i class="fa fa-trash" ></i></a>
                 '
-                ;	
+               ;	
 			}elseif ($field->Status=="Process"){                
                 $row[]='<span class="label label-info">Process</span>';	
                 $row[]="";
@@ -144,133 +144,145 @@ class Spk extends MY_Controller {
 		$this->load->view('template/footer');
     }
 
-    // function simpan(){
+    public function ubah($No_Spk = NULL)
+	{    
+        if($_POST)
+        {   
+            $No_Spk       	        = $this->input->post('txt_no_spk');
+            $optJnsKel       	    = $this->input->post('optJnsKel');
+            $datepicker         	= $this->input->post('datepicker');
+            $txt_alamat       	    = $this->input->post('txt_alamat');
+            $kd_salesman            = $this->input->post('kd_salesman');
+            $txt_nomesin        	= $this->input->post('txt_nomesin');
+            $txt_kd_merek       	= $this->input->post('txt_kd_merek');
+            $txt_kd_tipe       	    = $this->input->post('txt_kd_tipe');
+            $txt_kd_warna       	= $this->input->post('txt_kd_warna');
+            $txt_harga_kendaraan    = $this->input->post('txt_harga_kendaraan');
+            $kd_leasing         	= $this->input->post('kd_leasing');
+            $txt_uang_muka       	= $this->input->post('txt_uang_muka');
+            $txt_jns_road       	= $this->input->post('txt_jns_road');
+            $txt_jns_angsuran       = $this->input->post('txt_jns_angsuran');
+            $txt_kd_warna       	= $this->input->post('txt_kd_warna');
+            $txt_jns_pembayaran 	= $this->input->post('txt_jns_pembayaran');
+            $txt_tenor          	= $this->input->post('txt_tenor');
+            $txt_bunga          	= $this->input->post('txt_bunga');
+            $txt_angsuran       	= $this->input->post('txt_angsuran');
+            
+            $callback			= '';
+            if($txt_jns_pembayaran =="Kredit"){
+                $callback = "trim|required";
+            }
+
+            $this->form_validation->set_rules('txt_alamat','Alamat','trim|required');             
+            $this->form_validation->set_rules('txt_harga_kendaraan','Harga Kendaraan','trim|required');
+            $this->form_validation->set_rules('txt_uang_muka','Uang Muka','trim|required');   
+            
+            $this->form_validation->set_rules('kd_leasing','Leasing',$callback);
+            $this->form_validation->set_rules('txt_tenor','Tenor',$callback);
+            $this->form_validation->set_rules('txt_bunga','Bunga',$callback);
+            $this->form_validation->set_rules('txt_angsuran','Angsuran',$callback);
+
+            $this->form_validation->set_message('required', '%s harus diisi');
+            
+            if ($this->form_validation->run() == TRUE) { 
+                  
+                $this->db->trans_begin();
+                $update_spk = $this->spk->update_transaksi_spk($No_Spk,$datepicker, $txt_alamat, 
+                            $kd_salesman, $txt_jns_pembayaran, $txt_kd_merek,$txt_kd_tipe, 
+                            $txt_kd_warna, $txt_harga_kendaraan, $txt_uang_muka,$txt_angsuran, 
+                            $kd_leasing,$txt_tenor,$txt_bunga,$txt_jns_angsuran,$txt_jns_road,
+                            $optJnsKel);
+
+                if($update_spk)
+                {
+                    $this->db->trans_commit();
+                    echo json_encode(array('status' => 1, 'pesan' => "Transaksi berhasil diubah !"));    
+                }else
+                {
+                    $this->db->trans_rollback();
+                    $this->query_error();
+                }
+                       
+            }else
+            {             
+                echo json_encode(array('status' => 0, 'pesan' => validation_errors("<font color='red'>- ","</font><br />")));
+            } 
+        }else {            	
+            $result = array();
+            $spk_data = $this->spk->getSpkData($No_Spk);
+            $result['tb_spk'] = $spk_data;     
     
-    //     $config = array(
-    //         array(
-    //             'field' => 'txt_alamat',
-    //             'label' => 'Alamat Lengkap',
-    //             'rules' => 'required|xss_clean',
-    //             'errors' => array(
-    //                 'required' => 'Alamat harus diisi..',
-    //                         )
-    //             ),
-    //         array(
-    //             'field' => 'txt_cust',
-    //             'label' => 'Nama Customer',
-    //             'rules' => 'required|xss_clean',
-    //             'errors' => array(
-    //                 'required' => 'Nama Customer harus diisi..',
-    //                          )
-    //             ),   
-    //          array(
-    //                 'field' => 'kd_salesman',
-    //                 'label' => 'Salesman',
-    //                 'rules' => 'required|xss_clean',
-    //                 'errors' => array(
-    //                     'required' => 'Nama Salesman harus diisi..',
-    //                              )
-    //                 ),
-    //          array(
-    //                 'field' => 'txt_nomesin',
-    //                 'label' => 'No. Mesin',
-    //                 'rules' => 'required|xss_clean',
-    //                 'errors' => array(
-    //                     'required' => 'Nomor Mesin harus diisi..',
-    //                                 )
-    //                 )
-                    
-    //     );
-           
-      
-    //     $this->form_validation->set_rules($config);
-   
-    //     if ($this->form_validation->run()==FALSE){
-    //         $this->document->generate_page('transaksi/spk/tambah');         
-    //     }
-    //     else {  
-            
-            
-    //         $hasil = $this->spk->simpanDataSpk();
-    //         if($hasil){
-    //             $this->session->set_flashdata('psn_sukses','Data telah disimpan');
-    //         }
-    //         else {
-    //             $this->session->set_flashdata('psn_error','Gagal menyimpan data ');
-    //         }
-    //         redirect(base_url('transaksi/spk'));
-    //     }		
-    // }
+            $this->data['tb_customer'] = $this->leasing->getActiveLeasing();         
+            $this->data['tb_salesman'] = $this->salesman->getActiveSalesman();         
+            $this->data['spk_data'] = $result;
+            $this->render_template('transaksi/spk/ubah',$this->data);
+        }
+    }
 
     function simpan(){
-
         if($_POST)
         {
+            $txt_cust        	    = $this->input->post('txt_cust');
+            $txt_kd_cust        	= $this->input->post('txt_kd_cust');
+            $optJnsKel       	    = $this->input->post('optJnsKel');
+            $datepicker         	= $this->input->post('datepicker');
+            $txt_alamat       	    = $this->input->post('txt_alamat');
+            $kd_salesman            = $this->input->post('kd_salesman');
+            $txt_nomesin        	= $this->input->post('txt_nomesin');
+            $txt_kd_merek       	= $this->input->post('txt_kd_merek');
+            $txt_kd_tipe       	    = $this->input->post('txt_kd_tipe');
+            $txt_kd_warna       	= $this->input->post('txt_kd_warna');
+            $txt_harga_kendaraan    = $this->input->post('txt_harga_kendaraan');
+            $kd_leasing         	= $this->input->post('kd_leasing');
+            $txt_uang_muka       	= $this->input->post('txt_uang_muka');
+            $txt_jns_road       	= $this->input->post('txt_jns_road');
+            $txt_jns_angsuran       = $this->input->post('txt_jns_angsuran');
+            $txt_kd_warna       	= $this->input->post('txt_kd_warna');
+            $txt_jns_pembayaran 	= $this->input->post('txt_jns_pembayaran');
+            $txt_tenor          	= $this->input->post('txt_tenor');
+            $txt_bunga          	= $this->input->post('txt_bunga');
+            $txt_angsuran       	= $this->input->post('txt_angsuran');
+            $Status             	= "Waiting Process";
+            $Cetak              	= 0;
+   
+            $callback			= '';
+            if($txt_jns_pembayaran =="Kredit"){
+                $callback = "trim|required";
+            }
+
             $this->form_validation->set_rules('txt_kd_cust','Customer','trim|required');
             $this->form_validation->set_rules('optJnsKel','Jenis Kelamin','trim|required');
             $this->form_validation->set_rules('txt_alamat','Alamat','trim|required');
             $this->form_validation->set_rules('kd_salesman','Salesman','trim|required');
             $this->form_validation->set_rules('txt_nomesin','No Mesin','trim|required');
             $this->form_validation->set_rules('txt_harga_kendaraan','Harga Kendaraan','trim|required');
-            $this->form_validation->set_rules('txt_uang_muka','Uang Muka','trim|required');         
+            $this->form_validation->set_rules('txt_uang_muka','Uang Muka','trim|required');   
+            
+            $this->form_validation->set_rules('kd_leasing','Leasing',$callback);
+            $this->form_validation->set_rules('txt_tenor','Tenor',$callback);
+            $this->form_validation->set_rules('txt_bunga','Bunga',$callback);
+            $this->form_validation->set_rules('txt_angsuran','Angsuran',$callback);
+
             $this->form_validation->set_message('required', '%s harus diisi');
 
             if($this->form_validation->run() == TRUE)
-            {             
-                $txt_cust        	    = $this->input->post('txt_cust');
-                $txt_kd_cust        	= $this->input->post('txt_kd_cust');
-                $optJnsKel       	    = $this->input->post('optJnsKel');
-                $datepicker         	= $this->input->post('datepicker');
-                $txt_alamat       	    = $this->input->post('txt_alamat');
-                $txt_tipe_customer      = $this->input->post('txt_tipe_customer');
-                $kd_salesman            = $this->input->post('kd_salesman');
-                $txt_nomesin        	= $this->input->post('txt_nomesin');
-                $txt_kd_merek       	= $this->input->post('txt_kd_merek');
-                $txt_kd_tipe       	    = $this->input->post('txt_kd_tipe');
-                $txt_kd_warna       	= $this->input->post('txt_kd_warna');
-                $txt_harga_kendaraan    = $this->input->post('txt_harga_kendaraan');
-                $kd_leasing         	= $this->input->post('kd_leasing');
-                $txt_uang_muka       	= $this->input->post('txt_uang_muka');
-                $txt_jns_road       	= $this->input->post('txt_jns_road');
-                $txt_jns_angsuran       = $this->input->post('txt_jns_angsuran');
-                $txt_kd_warna       	= $this->input->post('txt_kd_warna');
-                $txt_jns_pembayaran 	= $this->input->post('txt_jns_pembayaran');
-                $txt_tenor          	= $this->input->post('txt_tenor');
-                $txt_bunga          	= $this->input->post('txt_bunga');
-                $txt_angsuran       	= $this->input->post('txt_angsuran');
-                $Status             	= "Waiting Process";
-                $Cetak              	= 0;
+            {              
+                $this->db->trans_begin();
+                $spk = $this->spk->insert_transaksi_spk($datepicker, $txt_kd_cust, $txt_cust, $txt_alamat, 
+                            $kd_salesman, $txt_jns_pembayaran, $txt_kd_merek, 
+                            $txt_kd_tipe, $txt_kd_warna, $txt_harga_kendaraan, $txt_uang_muka, 
+                            $txt_angsuran, $kd_leasing,$txt_tenor,$txt_bunga,$txt_jns_angsuran,$Status,$Cetak,
+                            $txt_jns_road,$optJnsKel,$txt_nomesin);
 
-                if($txt_jns_pembayaran=="Kredit"){
-                    $this->form_validation->set_rules('kd_leasing','Leasing','trim|required');
-                    $this->form_validation->set_rules('txt_tenor','Tenor','trim|required');
-                    $this->form_validation->set_rules('txt_bunga','Bunga','trim|required');
-                    $this->form_validation->set_rules('txt_angsuran','Angsuran','trim|required');
-                    $this->form_validation->set_message('required', '%s harus diisi');
-
-                    if($this->form_validation->run() == TRUE)
-                    {  
-                        $this->db->trans_begin();
-                        $spk = $this->spk->insert_transaksi_spk($datepicker, $txt_kd_cust, $txt_cust, $txt_alamat, 
-                                    $kd_salesman, $txt_jns_pembayaran, $txt_kd_merek, 
-                                    $txt_kd_tipe, $txt_kd_warna, $txt_harga_kendaraan, $txt_uang_muka, 
-                                    $txt_angsuran, $kd_leasing,$txt_tenor,$txt_bunga,$txt_jns_angsuran,$Status,$Cetak,
-                                    $txt_jns_road,$optJnsKel,$txt_nomesin);
-        
-                        if($spk)
-                        {
-                            $this->db->trans_commit();
-                            echo json_encode(array('status' => 1, 'pesan' => "Transaksi berhasil disimpan !"));    
-                        }else
-                        {
-                            $this->db->trans_rollback();
-                            $this->query_error();
-                        }
-                    }else
-                    {                     
-                       echo json_encode(array('status' => 0, 'pesan' => validation_errors("<font color='red'>- ","</font><br />")));
-                    } 
-                }
+                if($spk)
+                {
+                    $this->db->trans_commit();
+                    echo json_encode(array('status' => 1, 'pesan' => "Transaksi berhasil disimpan !"));    
+                }else
+                {
+                    $this->db->trans_rollback();
+                    $this->query_error();
+                }              
             }else
             {             
                echo json_encode(array('status' => 0, 'pesan' => validation_errors("<font color='red'>- ","</font><br />")));
@@ -278,26 +290,59 @@ class Spk extends MY_Controller {
         }
     }
 
-    function proses(){
-        $hasil = $this->spk->prosesDataSpk();
-        if($hasil){
-            $this->session->set_flashdata('psn_sukses','Data telah disimpan');
+    public function proses($No_Spk)
+	{
+        if($this->input->is_ajax_request())
+        {
+            $this->db->trans_begin();
+            $no_mesin = $this->input->post('no_mesin');
+ 
+            $prosesspk = $this->spk->proses_spk($No_Spk);
+            if($prosesspk)
+            {
+                $update_stok_spk = $this->spk->update_stok_spk($no_mesin,$No_Spk);    
+
+                if($update_stok_spk)
+                {
+                    $this->db->trans_commit();
+                    echo json_encode(array(
+                        "pesan" => "Data berhasil diproses
+                    "));
+                }             
+            }
+            else
+            {
+                $this->db->trans_rollback();
+                $this->query_error();
+                echo json_encode(array(
+                    "pesan" => "Terjadi kesalahan, coba lagi !
+                "));
+            }
         }
-        else {
-            $this->session->set_flashdata('psn_error','Gagal menyimpan data ');
-        }
-        redirect(base_url('transaksi/spk'));
     }
 
-    function batal(){
-        $hasil = $this->spk->batalspk();
-        if($hasil){
-            $this->session->set_flashdata('psn_sukses','Data telah disimpan');
-        }
-        else {
-            $this->session->set_flashdata('psn_error','Gagal menyimpan data ');
-        }
-        redirect(base_url('transaksi/spk'));
-    }
+    public function batal($No_Spk)
+	{
+        if($this->input->is_ajax_request())
+        {
+            $this->db->trans_begin();
 
+            $batal_spk = $this->spk->batal_spk($No_Spk);
+            if($batal_spk)
+            {             
+                $this->db->trans_commit();
+                echo json_encode(array(
+                    "pesan" => "Data berhasil dibatalkan
+                "));                         
+            }
+            else
+            {
+                $this->db->trans_rollback();
+                $this->query_error();
+                echo json_encode(array(
+                    "pesan" => "Terjadi kesalahan, coba lagi !
+                "));
+            }
+        }
+    }
 }

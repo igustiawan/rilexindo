@@ -4,10 +4,15 @@
     <h1 class="pull-left">
       <i class="fa fa-tasks"></i> Surat Pesanan Kendaraan (SPK)
     </h1>
-  <div class="pull-right">
-    <a href="<?php echo base_url('transaksi/spk/tambah')?>" class="btn btn-primary pull-right"><i class="fa fa-plus"></i> INPUT SPK</a>
-  </div>
 
+   <div class="pull-right">
+     <div class="col-xs-12">
+        <button class="btn btn-primary pull-right"  type="button" id="btn-reload"><i class="fa fa-refresh"></i> Reload</button>
+  
+        <a  style="margin-right: 5px;" href="<?php echo base_url('transaksi/spk/tambah')?>" class="btn btn-primary pull-right"><i class="fa fa-plus"></i> INPUT SPK</a>
+    </div>
+  </div>
+  
   </section>
 
 <!-- Main content -->
@@ -74,66 +79,67 @@
             ],
  
         });
- 
     });
+    $(document).ready(function (){    
+        $('#btn-reload').on('click', function(){
+            table.ajax.reload();
+        });
+    });
+
+    $(document).on('click', '#ProsesSpk', function(e){
+      e.preventDefault();
+      var Link = $(this).attr('href');
+      var Check = "<input type='hidden' value = "+$(this).parent().parent().find('td:nth-child(4)').html()+" name='no_mesin'  id='no_mesin'>";
+      $('.modal-dialog').removeClass('modal-lg');
+      $('.modal-dialog').addClass('modal-sm');
+      $('#ModalHeader').html('Konfirmasi');
+      $('#ModalContent').html('Anda yakin mau Proses SPK berikut <br /><b>'+$(this).parent().parent().find('td:nth-child(1)').html()+'</b> ?'+ Check);
+      $('#ModalFooter').html("<button type='button' class='btn btn-primary' id='YesSpk' data-url='"+Link+"'>Ya, saya yakin</button><button type='button' class='btn btn-default' data-dismiss='modal'>Batal</button>");
+      $('#ModalGue').modal('show');
+    });
+
+  $(document).on('click', '#YesSpk', function(e){
+      e.preventDefault();
+      $('#ModalGue').modal('hide');
+      var FormData = "no_mesin="+encodeURI($('#no_mesin').val());
+      $.ajax({
+        url: $(this).data('url'),
+        type: "POST",
+        cache: false,
+        data: FormData,
+        dataType:'json',
+        success: function(data){
+          alert(data.pesan);
+          $('#dataTable').DataTable().ajax.reload( null, false );
+        }
+      });
+	});
+
+  $(document).on('click', '#BatalSpk', function(e){
+      e.preventDefault();
+      var Link = $(this).attr('href');
+      $('.modal-dialog').removeClass('modal-lg');
+      $('.modal-dialog').addClass('modal-sm');
+      $('#ModalHeader').html('Konfirmasi');
+      $('#ModalContent').html('Anda yakin mau batal SPK berikut <br /><b>'+$(this).parent().parent().find('td:nth-child(1)').html()+'</b> ?');
+      $('#ModalFooter').html("<button type='button' class='btn btn-primary' id='YesBatalSpk' data-url='"+Link+"'>Ya, saya yakin</button><button type='button' class='btn btn-default' data-dismiss='modal'>Batal</button>");
+      $('#ModalGue').modal('show');
+	});
+
+  $(document).on('click', '#YesBatalSpk', function(e){
+      e.preventDefault();
+      $('#ModalGue').modal('hide');
+
+      $.ajax({
+        url: $(this).data('url'),
+        type: "POST",
+        cache: false,
+        dataType:'json',
+        success: function(data){
+          alert(data.pesan);
+          $('#dataTable').DataTable().ajax.reload( null, false );
+        }
+      });
+	});
+
 </script>
-
- <?php foreach($all as $row): ?>
- <div class="modal" id="modal_proses<?php echo $row->No_Spk;?>" tabindex="-1" role="dialog" aria-labelledby="largeModal" aria-hidden="true">
-      <div class="modal-dialog">
-      <div class="modal-content">
-      <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-          <h3 class="modal-title" id="myModalLabel">Proses SPK</h3>
-      </div>
-      <form class="form-horizontal" method="post" action="<?php echo base_url('transaksi/spk/proses')?>">
-          <div class="modal-body">
-              <p>Anda yakin mau Proses SPK berikut : <b><?php echo $row->No_Spk;?></b></p>
-              <table class="table">
-                    <tr>
-                        <th>Nama Customer</th>
-                        <td><input style="border:none" type="text" name="txt_nm_cust" value="<?php echo $row->Nm_Cust;?>"></td>
-                    </tr>
-                    <tr>
-                        <th>Alamat</th>
-                        <td><input style="border:none" type="text" name="txt_alamat" value="<?php echo $row->Alamat;?>"></td>
-                    </tr>
-                    <tr>
-                        <th>No Mesin</th>
-                        <td><input style="border:none" type="text" name="txt_no_mesin" value="<?php echo $row->No_Mesin;?>"></td>
-                    </tr>
-                </table>
-          </div>
-          <div class="modal-footer">
-              <input type="hidden" name="txt_no_spk" value="<?php echo $row->No_Spk;?>" >
-              <button class="btn" data-dismiss="modal" aria-hidden="true">Tutup</button>
-              <button class="btn btn-danger">Process</button>
-          </div>
-      </form>
-      </div>
-      </div>
-</div>   
-<?php endforeach; ?> 
-
-<?php foreach($all as $row): ?>
- <div class="modal" id="modal_batal<?php echo $row->No_Spk;?>" tabindex="-1" role="dialog" aria-labelledby="largeModal" aria-hidden="true">
-      <div class="modal-dialog">
-      <div class="modal-content">
-      <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-          <h3 class="modal-title" id="myModalLabel">BATAL SPK</h3>
-      </div>
-      <form class="form-horizontal" method="post" action="<?php echo base_url('transaksi/spk/batal')?>">
-          <div class="modal-body">
-              <p>Anda yakin mau BATAL SPK berikut : <b><?php echo $row->No_Spk;?></b></p>
-          </div>
-          <div class="modal-footer">
-              <input type="hidden" name="txt_no_spk" value="<?php echo $row->No_Spk;?>" >
-              <button class="btn" data-dismiss="modal" aria-hidden="true">Tutup</button>
-              <button class="btn btn-danger">Batal</button>
-          </div>
-      </form>
-      </div>
-      </div>
-</div>   
-<?php endforeach; ?> 

@@ -35,5 +35,14 @@ class MY_Controller extends CI_Controller
 		$t = trim($t);
 		return $t;
     }
-    
+		
+		public function render_template($page = null, $data = array())
+		{
+			$this->load->view('template/header',$data);
+			$this->load->view('template/leftside',$data);
+			$this->load->view($page, $data);
+			$this->load->view('template/footer_js',$data);
+			$this->load->view('template/footer',$data);
+		}
+
 }

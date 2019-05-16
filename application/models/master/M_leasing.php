@@ -81,6 +81,13 @@ class M_leasing extends CI_Model {
         }
     }
 
+    public function getActiveLeasing()
+	{
+		$sql = "SELECT * FROM tb_customer WHERE Flag = ?";
+		$query = $this->db->query($sql, array('F'));
+		return $query->result_array();
+    }
+
     function idLeasing(){
 		$q = $this->db->query("select MAX(RIGHT(Kd_Cust,5)) as kd_max from tb_customer where flag = 'F'");
         $kd = "";
