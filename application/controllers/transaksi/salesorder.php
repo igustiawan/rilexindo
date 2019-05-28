@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Salesorder extends CI_Controller {
+class Salesorder extends MY_Controller {
 
     public function __construct()
 	{
@@ -78,7 +78,8 @@ class Salesorder extends CI_Controller {
 				$row[]=
 				//'<a class="btn btn-primary btn-xs" data-toggle="modal" data-target="#modal_print'.$field->No_So.'" title="Print" rel="tooltip"><i class="fa fa-print"></i></a>			
 				//'<a href="'.base_url().'transaksi/salesorder/cetak/'.$field->No_So.'" target="_blank" class="btn btn-primary btn-xs" id="Cetaks" title="Print" rel="tooltip"><i class="fa fa-print"></i></a>'
-				'<a target="__blank" href="'.base_url('transaksi/salesorder/cetak/'.$field->No_So).'" class="btn btn-default btn-sm"><i class="fa fa-print"></i></a>'
+				//'<a href="'.base_url('transaksi/salesorder/cetak/'.$field->No_So).'" id=CetakSo class="btn btn-default btn-sm"><i class="fa fa-print"></i></a>'
+				'<a id=CetakSo class="btn btn-default btn-sm"><i class="fa fa-print"></i></a>'
 				;				
 			}elseif ($field->Status=="Approved" && $field->Cetak=="1" && $field->Status_Bast=="0" ){   
 				$row[]='<span class="label label-info">Approved</span>';	
@@ -132,15 +133,154 @@ class Salesorder extends CI_Controller {
 		echo json_encode($callback); // konversi varibael $callback menjadi JSON
 	}
 
+	public function ubah($No_So = NULL)
+	{  
+		if($_POST)
+        { 
+			$txt_no_so       	    = $this->input->post('txt_no_so');
+			$No_Spk       	        = $this->input->post('txt_nospk');
+            $txt_bunga          	= $this->input->post('txt_bunga');
+			$txt_tunai       		= $this->input->post('txt_tunai');
+			$txt_hrg_mobil       	= $this->input->post('txt_hrg_mobil');
+			$txt_dp_murni       	= $this->input->post('txt_dp_murni');
+			$txt_adm      			= $this->input->post('txt_adm');
+			$txt_angsuran_1      	= $this->input->post('txt_angsuran_1');
+			$txt_lama_angs      	= $this->input->post('txt_lama_angs');
+			$txt_jml_angs      		= $this->input->post('txt_jml_angs');
+			$txt_biaya_adm      	= $this->input->post('txt_biaya_adm');
+			$txt_keterangan      	= $this->input->post('txt_keterangan');
+			$txt_nomesin      		= $this->input->post('txt_nomesin');
+			$txt_diskon      		= $this->input->post('txt_diskon');
+
+			$this->form_validation->set_rules('txt_diskon','Nominal Diskon','trim|required');   
+			$this->form_validation->set_rules('txt_tunai','Nominal Tunai','trim|required');   
+			$this->form_validation->set_rules('txt_dp_murni','Nominal DP','trim|required');  
+			$this->form_validation->set_rules('txt_adm','Nominal ADM','trim|required');  
+			$this->form_validation->set_rules('txt_bunga','Nominal Bunga','trim|required'); 
+			$this->form_validation->set_rules('txt_lama_angs','Lama Angsuran','trim|required'); 
+			$this->form_validation->set_rules('txt_jml_angs','Jumlah Angsuran','trim|required');
+
+			$this->form_validation->set_message('required', '%s harus diisi');
+
+			if ($this->form_validation->run() == TRUE) { 
+                  
+                $update_so = $this->salesorder->update_transaksi_so($txt_no_so,$txt_tunai,$txt_hrg_mobil,$txt_dp_murni,
+							$txt_adm,$txt_angsuran_1,$txt_bunga,$txt_lama_angs,$txt_jml_angs,
+							$txt_biaya_adm,$txt_keterangan,$txt_nomesin,$txt_diskon);
+
+                if($update_so)
+                {
+                    echo json_encode(array('status' => 1, 'pesan' => "Transaksi berhasil diubah !"));    
+                }else
+                {
+                    $this->query_error();
+                }
+                       
+            }else
+            {             
+                echo json_encode(array('status' => 0, 'pesan' => validation_errors("<font color='red'>- ","</font><br />")));
+			} 
+			
+		}else{
+			$result = array();
+            $so_data = $this->salesorder->getSoData($No_So);
+            $result['tb_so'] = $so_data;            
+            $this->data['so_data'] = $result;
+            $this->render_template('transaksi/salesorder/ubah',$this->data);
+		}
+	}
+
 	function simpan(){
-		$hasil = $this->salesorder->simpanDataSalesOrder();
-		if($hasil){
-			$this->session->set_flashdata('psn_sukses','Data telah disimpan');
+        if($_POST)
+        {
+			$nospk        	   		= $this->input->post('nospk');
+			$datepicker         	= $this->input->post('datepicker');
+			$kd_salesman        	= $this->input->post('kd_salesman');
+			$txt_jns_pembayaran 	= $this->input->post('txt_jns_pembayaran');
+			$kd_leasing         	= $this->input->post('kd_leasing');
+			$txt_po_leasing         = $this->input->post('txt_po_leasing');
+			$txt_cust        		= $this->input->post('txt_cust');
+			$txt_kd_cust        	= $this->input->post('txt_kd_cust');
+			$txt_alamat       	    = $this->input->post('txt_alamat');
+			$txt_tunai       	    = $this->input->post('txt_tunai');
+			$txt_hrg_mobil       	= $this->input->post('txt_hrg_mobil');
+			$txt_dp_murni       	= $this->input->post('txt_dp_murni');
+			$txt_adm      		 	= $this->input->post('txt_adm');
+			$txt_angsuran_1      	= $this->input->post('txt_angsuran_1');
+			$txt_bunga      		= $this->input->post('txt_bunga');
+			$txt_lama_angs      	= $this->input->post('txt_lama_angs');
+			$txt_jml_angs     	 	= $this->input->post('txt_jml_angs');
+			$txt_biaya_adm     	 	= $this->input->post('txt_biaya_adm');
+			$txt_keterangan     	= $this->input->post('txt_keterangan');
+			$txt_nomesin     		= $this->input->post('txt_nomesin');
+			$txt_diskon     		= $this->input->post('txt_diskon');
+
+			$callback			= '';
+            if($txt_jns_pembayaran =="Kredit"){
+                $callback = "trim|required";
+            }
+
+			$this->form_validation->set_rules('nospk','No Spk','trim|required');
+			$this->form_validation->set_rules('txt_jns_pembayaran','Jenis Pembayaran','trim|required');
+			$this->form_validation->set_rules('txt_cust','Customer','trim|required'	);
+			$this->form_validation->set_rules('txt_alamat','Alamat','trim|required'	);
+			$this->form_validation->set_rules('kd_salesman','Salesman','trim|required');
+
+			$this->form_validation->set_rules('kd_leasing','Leasing',$callback);
+			$this->form_validation->set_rules('txt_po_leasing','PO Leasing',$callback);
+
+			$this->form_validation->set_message('required', '%s harus diisi');
+
+            if($this->form_validation->run() == TRUE)
+            {              
+		
+				$kd= $this->salesorder->idSalesOrder();
+
+				$data_header = array(
+					'No_So'=> $kd,
+					'Tgl_So'=> $datepicker,
+					'Kd_Cust'=> $txt_kd_cust, 
+					'Nm_Cust'=> $txt_cust, 
+					'Alamat'=> $txt_alamat, 
+					'Kd_Salesman'=> $kd_salesman, 
+					'Jns_Bayar'=>  $txt_jns_pembayaran, 
+					'By_Tunai'=> preg_replace("/[^0-9]/", "", $txt_tunai), 
+					'Ttl_Hrg_Otr'=> preg_replace("/[^0-9]/", "", $txt_hrg_mobil), 
+					'DP'=> preg_replace("/[^0-9]/", "", $txt_dp_murni), 
+					'ADM'=> preg_replace("/[^0-9]/", "", $txt_adm), 
+					'ADDM'=> preg_replace("/[^0-9]/", "", $txt_angsuran_1), 
+					'Bunga'=> preg_replace("/[^0-9]/", "", $txt_bunga), 
+					'Tenor'=> $txt_lama_angs, 
+					'Angsuran'=> preg_replace("/[^0-9]/", "", $txt_jml_angs),   
+					'Tipe_Angs'=> $txt_biaya_adm, 
+					'Keterangan'=> $txt_keterangan, 
+					'Status'=> "Waiting Process",
+					'Cetak'=> "0",
+					'No_Spk'=> $nospk, 
+					'No_Po_Leasing'=> $txt_po_leasing,
+					'Kd_Fincoy'=> $kd_leasing, 
+				);
+				         
+				$data_detail = array(
+					'Fk_So'=> $kd,
+					'No_Mesin' => $txt_nomesin,
+					'Diskon' => preg_replace("/[^0-9]/", "", $txt_diskon), 
+				);
+
+				$salesorder = $this->salesorder->simpanHeaderDetailSalesOrder($data_header, $data_detail);
+                if($salesorder)
+                {
+					echo json_encode(array('status' => 1, 'pesan' => "Transaksi berhasil disimpan !"));   
+                }else
+                {
+                    $this->query_error();
+                }              
+            }else
+            {             
+               echo json_encode(array('status' => 0, 'pesan' => validation_errors("<font color='red'>- ","</font><br />")));
+			}
+			
 		}
-		else {
-			$this->session->set_flashdata('psn_error','Gagal menyimpan data ');
-		}
-		redirect(base_url('transaksi/salesorder'));
 	}
 	
 	function batal(){
@@ -176,20 +316,16 @@ class Salesorder extends CI_Controller {
         redirect(base_url('transaksi/salesorder'));
 	}
 
-	public function cetak($id)
-	{
-	
-		
-		$order_data = $this->salesorder->getOrdersData($id);
+	public function cetak($no_so){
+		$order_data = $this->salesorder->getOrdersData($no_so);
 
 		$this->db->query("update tb_so set Cetak= '1' where No_So = '".$order_data['No_So']."'"); 
-
 
 		$this->load->library('cfpdf');		
 		$pdf = new FPDF('P','mm','letter');
 		$pdf->AddPage();
 		$pdf->SetFont('Arial','',10);	
-	
+
 		$pdf->Cell(110, 14, $order_data['No_So'], 0, 0, 'R');
 		$pdf->Ln();
 
@@ -225,7 +361,7 @@ class Salesorder extends CI_Controller {
 		$pdf->SetX(20);
 		$pdf->Cell(55, 6,  $order_data['Warna'], 0, 0, 'L');
 		$pdf->Cell(35, 6,  'Discount', 0, 0, 'L');	
-		
+
 		$pdf->Cell(30, 6,  'Rp.' . ' ' . number_format($order_data['Diskon']), 0, 0, 'L');	
 
 		$pdf->Ln();
@@ -244,14 +380,12 @@ class Salesorder extends CI_Controller {
 		$pdf->Ln();
 		$pdf->Ln();
 		$pdf->Ln();
-		
+
 		$pdf->Ln();
 		$pdf->SetX(160);
 		$pdf->Cell(30, 6,  'Rp.' . ' ' . number_format($order_data['Hrg_Jual']+$order_data['Diskon']), 0, 0, 'L');	
 
-		$pdf->Ln();
-		$pdf->Ln();
-		$pdf->Ln();
+		$pdf->Ln();$pdf->Ln();$pdf->Ln();
 
 		$pdf->SetX(25);
 		$pdf->Cell(30, 6,  number_format($order_data['Hrg_Jual']+$order_data['Diskon']), 0, 0, 'L');	
@@ -273,9 +407,7 @@ class Salesorder extends CI_Controller {
 		$pdf->Cell(60, 6,  number_format($order_data['Angsuran']), 0, 0, 'L');	
 		$pdf->Cell(30, 6,  number_format($order_data['Tenor']), 0, 0, 'L');
 
-		$pdf->Output();
-
-
+		$pdf->Output('I');
+		exit;
 	}
-
 }

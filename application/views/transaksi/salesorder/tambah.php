@@ -14,7 +14,8 @@
             <div class="box-header with-border">
         </div>
         <div class="box-body">
-            <form action="<?php echo base_url('transaksi/salesorder/simpan')?>" method="post" class="form-horizontal" name="autoSumForm">  
+            <!-- <form action="<?php //echo base_url('transaksi/salesorder/simpan')?>" method="post" class="form-horizontal" name="autoSumForm">   -->
+            <div class="form-horizontal">
             <div class="form-group ">
                 <label for="tipe" class="col-md-2 control-label">No Spk</label>
                 <div class="col-md-3">
@@ -252,9 +253,10 @@
             </div>
             <div class="box-footer text-right">
                 <a class="btn btn-default" href="<?php echo base_url('transaksi/salesorder/tambah')?>"><i class="fa fa-close"></i> Batal</a>
-                <button type="submit" name="btnSimpan" class="btn btn-success"><i class="fa fa-check icon-white"></i> Simpan</button>
+                <button type="submit" id='Simpann' name="btnSimpan" class="btn btn-success"><i class="fa fa-check icon-white"></i> Simpan</button>
              </div>
-            </form>
+             </div>
+            <!-- </form> -->
         </div>
         </div>
     <!-- /.box -->
@@ -318,7 +320,7 @@ function search(){
                 } 
                 //menampilkan ke table
                 table ='<tr>';
-                table +='<td><input style="border:none" name="txt_nomesin" readonly type="text" value='+response.No_Mesin+'></td>';
+                table +='<td><input style="border:none" name="txt_nomesin"  id="txt_nomesin" readonly type="text" value='+response.No_Mesin+'></td>';
                 table +='<td><input style="border:none" readonly type="text" value='+response.Tipe+'></td>';
                 table +='<td><input style="border:none" readonly type="text" value='+response.Warna+'></td>';
                 table +='<td><input style="border:none" readonly type="text" value='+response.Jml_Harga+'></td>';
@@ -406,4 +408,72 @@ function change_harga(){
          });
     });
 
+    $(document).on('click', '#Simpann', function(){
+        $('.modal-dialog').removeClass('modal-lg');
+        $('.modal-dialog').addClass('modal-sm');
+        $('#ModalHeader').html('Konfirmasi');
+        $('#ModalContent').html("Apakah anda yakin ingin menyimpan transaksi ini ?");
+        $('#ModalFooter').html("<button type='button' class='btn btn-primary' id='SimpanTransaksi'>Ya, saya yakin</button><button type='button' class='btn btn-default' data-dismiss='modal'>Batal</button>");
+        $('#ModalGue').modal('show');
+
+        setTimeout(function(){ 
+            $('button#SimpanTransaksi').focus();
+        }, 500);
+    });
+
+    $(document).on('click', 'button#SimpanTransaksi', function(){
+        SimpanTransaksi();
+    });
+
+    function SimpanTransaksi()
+    {
+        var FormData = "nospk="+encodeURI($('#nospk').val());
+        FormData += "&datepicker="+$('#datepicker').val();
+        FormData += "&txt_cust="+encodeURI($('#txt_cust').val());
+        FormData += "&txt_kd_cust="+encodeURI($('#txt_kd_cust').val());   
+        FormData += "&txt_alamat="+$('#txt_alamat').val();
+        FormData += "&kd_salesman="+$('#kd_salesman').val();
+        FormData += "&txt_jns_pembayaran="+ $('input:radio[name=txt_jns_pembayaran]:checked').val();
+        FormData += "&kd_leasing="+$('#kd_leasing').val();
+        FormData += "&txt_po_leasing="+$('#txt_po_leasing').val();
+        FormData += "&txt_tunai="+$('#txt_tunai').val();
+        FormData += "&txt_dp_murni="+$('#txt_dp_murni').val();
+        FormData += "&txt_adm="+$('#txt_adm').val();
+        FormData += "&txt_angsuran_1="+$('#txt_angsuran_1').val();
+        FormData += "&txt_total="+$('#txt_total').val();
+        FormData += "&txt_hrg_mobil="+$('#txt_hrg_mobil').val();
+        FormData += "&txt_jml_kredit="+$('#txt_jml_kredit').val();
+        FormData += "&txt_total_dp="+$('#txt_total_dp').val();
+        FormData += "&txt_lama_angs="+$('#txt_lama_angs').val();
+        FormData += "&txt_biaya_adm="+ $('input:radio[name=txt_biaya_adm]:checked').val();
+        FormData += "&txt_bunga="+$('#txt_bunga').val();
+        FormData += "&txt_jml_angs="+$('#txt_jml_angs').val();
+        FormData += "&txt_keterangan="+$('#txt_keterangan').val();
+        FormData += "&txt_diskon="+$('#txt_diskon').val();
+        FormData += "&txt_nomesin="+$('#txt_nomesin').val();
+
+        $.ajax({
+            url: "<?php echo base_url('transaksi/salesorder/simpan'); ?>",
+            type: "POST",
+            cache: false,
+            data: FormData,
+            dataType:'json',
+            success: function(data){
+                if(data.status == 1)
+                {
+                    alert(data.pesan);
+                    window.location.href="<?php echo site_url('transaksi/salesorder'); ?>";
+                }
+                else 
+                {
+                    $('.modal-dialog').removeClass('modal-lg');
+                    $('.modal-dialog').addClass('modal-sm');
+                    $('#ModalHeader').html('Oops !');
+                    $('#ModalContent').html(data.pesan);
+                    $('#ModalFooter').html("<button type='button' class='btn btn-primary' data-dismiss='modal' autofocus>Ok</button>");
+                    $('#ModalGue').modal('show');
+                }	
+            }
+        });
+    }
 </script>

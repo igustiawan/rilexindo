@@ -83,8 +83,7 @@ class M_salesorder extends CI_Model {
 			->where('Status_Piutang', 'A')
 			->limit(1)
 			->get('tb_piutang');
-    }
-    
+    }  
 
     public function viewByNoSpk($NoSpk){	
         $this->db->select('a.Nm_Cust,a.Kd_Cust,a.Alamat,a.Kd_Salesman,a.Jns_Bayar,a.Kd_Fincoy,a.No_Mesin,
@@ -115,8 +114,6 @@ class M_salesorder extends CI_Model {
         $result = $this->db->get('tb_so a')->row_array(); 		
         return $result; 
 	}
-
-
     
     public function ambilDataSalesOrder(){	
         $this->db->select('a.No_So,a.Nm_Cust,a.Alamat,b.No_Mesin,a.Jns_Bayar,a.By_Tunai,a.Ttl_Hrg_Otr,
@@ -150,76 +147,15 @@ class M_salesorder extends CI_Model {
         //urutan 01 itu next kalau ada cabang bisa disetting menjadi 02 dst..
     }
 
-    function simpanDataSalesOrder(){
-        $this->db->trans_begin();
+    function simpanHeaderDetailSalesOrder($data_header, $data_detail){
+        $this->db->trans_start();
 
-        $kd = $this->idSalesOrder();       
-        $Tgl_So = $this->input->post('txt_tgl_so');
-        $Kd_Cust = $this->input->post('txt_kd_cust');
-        $Nm_Cust = $this->input->post('txt_cust');
-        $Alamat = $this->input->post('txt_alamat');
-        $Kd_Salesman = $this->input->post('kd_salesman');
-        $Jns_Bayar = $this->input->post('txt_jns_pembayaran');
-        $By_Tunai = $this->input->post('txt_tunai');
-        $Ttl_Hrg_Otr = $this->input->post('txt_hrg_mobil');
-        $DP = $this->input->post('txt_dp_murni');
-        $ADM = $this->input->post('txt_adm');
-        $ADDM = $this->input->post('txt_angsuran_1');
-        $Bunga = $this->input->post('txt_bunga');
-        $Tenor = $this->input->post('txt_lama_angs');
-        $Angsuran = $this->input->post('txt_jml_angs');
-        $Tipe_Angs = $this->input->post('txt_biaya_adm');
-        $Keterangan = $this->input->post('txt_keterangan');
-        $No_Spk = $this->input->post('nospk');
+        $this->db->insert('tb_so',$data_header);
 
-        $Kd_Fincoy = $this->input->post('kd_leasing');
-        $No_Po_Leasing = $this->input->post('txt_po_leasing');
- 
-        $No_Mesin = $this->input->post('txt_nomesin');
-        $Diskon = $this->input->post('txt_diskon');
+        $this->db->insert('tb_so_detail',$data_detail);
 
-        $data = array(
-            'No_So'=> $kd,
-            'Tgl_So'=> $Tgl_So,
-            'Kd_Cust'=> $Kd_Cust, 
-            'Nm_Cust'=> $Nm_Cust, 
-            'Alamat'=> $Alamat, 
-            'Kd_Salesman'=> $Kd_Salesman, 
-            'Jns_Bayar'=>  $Jns_Bayar, 
-            'By_Tunai'=> preg_replace("/[^0-9]/", "", $By_Tunai), 
-            'Ttl_Hrg_Otr'=> preg_replace("/[^0-9]/", "", $Ttl_Hrg_Otr), 
-            'DP'=> preg_replace("/[^0-9]/", "", $DP), 
-            'ADM'=> preg_replace("/[^0-9]/", "", $ADM), 
-            'ADDM'=> preg_replace("/[^0-9]/", "", $ADDM), 
-            'Bunga'=> preg_replace("/[^0-9]/", "", $Bunga), 
-            'Tenor'=> $Tenor, 
-            'Angsuran'=> preg_replace("/[^0-9]/", "", $Angsuran),   
-            'Tipe_Angs'=> $Tipe_Angs, 
-            'Keterangan'=> $Keterangan, 
-            'Status'=> "Waiting Process",
-            'Cetak'=> "0",
-            'No_Spk'=> $No_Spk, 
-            'No_Po_Leasing'=> $No_Po_Leasing,
-            'Kd_Fincoy'=> $Kd_Fincoy, 
-			);
-
-        $this->db->insert('tb_so', $data);
-
-        $data_detail_so = array(
-            'Fk_So'=> $kd,
-            'No_Mesin' => $No_Mesin,
-            'Diskon' => preg_replace("/[^0-9]/", "", $Diskon), 
-            );
-        $this->db->insert('tb_so_detail', $data_detail_so); 
-
-        if($this->db->affected_rows() > 0){
-            $this->db->trans_commit();
-            return true;
-        }
-        else {
-            $this->db->trans_rollback();
-            return false;
-        }
+        $this->db->trans_complete();
+        return true;
     }
 
     function batalsalesorder(){
@@ -257,6 +193,73 @@ class M_salesorder extends CI_Model {
         }
     }
 
- 
+    public function getSoData($No_So = null)
+	{
+		if($No_So) {
+			$sql = "select a.No_So,a.Nm_Cust,a.Alamat,b.No_Mesin,a.Jns_Bayar,a.By_Tunai,a.Ttl_Hrg_Otr,a.No_Spk,
+            a.Tenor,a.Angsuran,b.Diskon,d.Tipe,e.Warna,a.Bunga,a.Kd_Cust,a.Tgl_So,a.Kd_Fincoy,ADDM,Tipe_Angs,Keterangan,
+            a.ADM,f.Nm_Cust as Nm_Fincoy,a.DP,case when a.Jns_Bayar = 'Tunai' then a.By_Tunai when a.Jns_Bayar =  'Kredit' 
+            then a.Ttl_Hrg_Otr end as Hrg_Jual,c.No_Polisi,g.Pekerjaan,g.Telepon,c.No_Chassis,c.No_Mesin,b.Diskon,h.Nm_Salesman,a.No_Po_Leasing
+            from tb_so a 
+            inner join tb_so_detail b on a.no_so = b.Fk_So
+            inner join tb_stock c on b.No_Mesin = c.No_Mesin
+            inner join tb_tipe d on d.Kd_Tipe = c.Kd_Tipe
+            inner join tb_warna e on e.Kd_Warna = c.Kd_Warna
+            left join tb_customer f on f.Kd_Cust = a.Kd_Fincoy
+            left join tb_customer g on g.Kd_Cust = a.Kd_Cust
+            left join tb_salesman h on h.Kd_Salesman = a.Kd_Salesman
+            WHERE a.No_So = ?";
+			$query = $this->db->query($sql, array($No_So));
+			return $query->row_array();
+		}
+
+		$sql = "select a.No_So,a.Nm_Cust,a.Alamat,b.No_Mesin,a.Jns_Bayar,a.By_Tunai,a.Ttl_Hrg_Otr,a.No_Spk,
+            a.Tenor,a.Angsuran,b.Diskon,d.Tipe,e.Warna,a.Bunga,a.Kd_Cust,a.Tgl_So,a.Kd_Fincoy,ADDM,Tipe_Angs,Keterangan,
+            a.ADM,f.Nm_Cust as Nm_Fincoy,a.DP,case when a.Jns_Bayar = 'Tunai' then a.By_Tunai when a.Jns_Bayar =  'Kredit' 
+            then a.Ttl_Hrg_Otr end as Hrg_Jual,c.No_Polisi,g.Pekerjaan,g.Telepon,c.No_Chassis,c.No_Mesin,b.Diskon,h.Nm_Salesman,a.No_Po_Leasing
+            from tb_so a 
+            inner join tb_so_detail b on a.no_so = b.Fk_So
+            inner join tb_stock c on b.No_Mesin = c.No_Mesin
+            inner join tb_tipe d on d.Kd_Tipe = c.Kd_Tipe
+            inner join tb_warna e on e.Kd_Warna = c.Kd_Warna
+            left join tb_customer f on f.Kd_Cust = a.Kd_Fincoy
+            left join tb_customer g on g.Kd_Cust = a.Kd_Cust
+            left join tb_salesman h on h.Kd_Salesman = a.Kd_Salesman
+            ORDER BY No_So DESC";
+		$query = $this->db->query($sql);
+		return $query->result_array();
+    }
+
+    function update_transaksi_so($txt_no_so,$txt_tunai,$txt_hrg_mobil,$txt_dp_murni,
+                    $txt_adm,$txt_angsuran_1,$txt_bunga,$txt_lama_angs,$txt_jml_angs,
+                    $txt_biaya_adm,$txt_keterangan,$txt_nomesin,$txt_diskon)
+        {
+        $this->db->trans_start();
+        
+        $dt['No_So']        = $txt_no_so;
+        $dt['By_Tunai']		= preg_replace("/[^0-9]/", "", $txt_tunai);
+        $dt['Ttl_Hrg_Otr']	= preg_replace("/[^0-9]/", "", $txt_hrg_mobil);
+        $dt['DP']	        = preg_replace("/[^0-9]/", "", $txt_dp_murni);
+        $dt['ADM']          = preg_replace("/[^0-9]/", "", $txt_adm);
+        $dt['ADDM']		    = preg_replace("/[^0-9]/", "", $txt_angsuran_1);
+        $dt['Bunga']	    = preg_replace("/[^0-9]/", "", $txt_bunga);
+        $dt['Tenor']	    = $txt_lama_angs;
+        $dt['Angsuran']     = preg_replace("/[^0-9]/", "", $txt_jml_angs);
+        $dt['Tipe_Angs']	= $txt_biaya_adm;
+        $dt['Keterangan']	= $txt_keterangan;
+
+        $this->db->where('No_So', $txt_no_so);
+        $this->db->update('tb_so', $dt);
+
+        /*update detail sales order*/
+        $dt_so['No_Mesin']    = $txt_nomesin;
+        $dt_so['Diskon']      = preg_replace("/[^0-9]/", "", $txt_diskon);
+
+        $this->db->where('Fk_So', $txt_no_so);
+        $this->db->update('tb_so_detail', $dt_so);
+
+        $this->db->trans_complete();
+        return true;
+        }
 
 }

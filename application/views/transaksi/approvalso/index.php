@@ -175,8 +175,9 @@
           </div>
           <div class="modal-footer">
               <input type="hidden" name="txt_no_so" value="<?php echo $row->No_So;?>" >  
-              <button class="btn" data-dismiss="modal" aria-hidden="true">Tutup</button>          
               <button class="btn btn-danger">Process</button>
+              <button class="btn" data-dismiss="modal" aria-hidden="true">Tutup</button>          
+             
           </div>
       </form>
        

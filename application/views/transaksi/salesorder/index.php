@@ -152,8 +152,9 @@
           </div>
           <div class="modal-footer">
               <input type="hidden" name="txt_no_so" value="<?php echo $row->No_So;?>" >
-              <button class="btn" data-dismiss="modal" aria-hidden="true">Tutup</button>
               <button class="btn btn-danger">Process</button>
+              <button class="btn" data-dismiss="modal" aria-hidden="true">Tutup</button>
+             
           </div>
       </form>
       </div>
@@ -176,9 +177,9 @@
               <p>Anda yakin mau batal sales order berikut : <b><?php echo $row->No_So;?></b></p>
           </div>
           <div class="modal-footer">
-              <input type="hidden" name="txt_no_so" value="<?php echo $row->No_So;?>" >
+              <input type="hidden" name="txt_no_so" value="<?php echo $row->No_So;?>" >            
+              <button class="btn btn-danger">Process</button>
               <button class="btn" data-dismiss="modal" aria-hidden="true">Tutup</button>
-              <button class="btn btn-danger">Batal</button>
           </div>
       </form>
       </div>
@@ -219,8 +220,8 @@
           </div>
           <div class="modal-footer">
               <input type="hidden" name="txt_no_so" value="<?php echo $row->No_So;?>" >
-              <button class="btn" data-dismiss="modal" aria-hidden="true">Tutup</button>
               <button class="btn btn-danger">Process</button>
+              <button class="btn" data-dismiss="modal" aria-hidden="true">Tutup</button>
           </div>
       </form>
       </div>
@@ -229,4 +230,25 @@
 <?php endforeach; ?>
 <!-- END MODAL PERSETUJUAN BAST -->
 
+<script>
+ $(document).on('click', '#CetakSo', function(e){
+      e.preventDefault();
+      var Link = $(this).attr('href');
+      var Check = "<input type='hidden' value = "+$(this).parent().parent().find('td:nth-child(1)').html()+" name='no_so'  id='no_so'>";
+      $('.modal-dialog').removeClass('modal-lg');
+      $('.modal-dialog').addClass('modal-sm');
+      $('#ModalHeader').html('Konfirmasi');
+      $('#ModalContent').html('Anda yakin mau Cetak So berikut <br /><b>'+$(this).parent().parent().find('td:nth-child(1)').html()+'</b> ?'+ Check);
+      $('#ModalFooter').html("<button type='button' class='btn btn-primary' id='YesCetakSo' data-url='"+Link+"'>Ya, saya yakin</button><button type='button' class='btn btn-default' data-dismiss='modal'>Batal</button>");
+      $('#ModalGue').modal('show');
+    });
 
+    $(document).on('click', '#YesCetakSo', function(e){
+      var base_url = "<?php echo base_url();?>";
+      var no_so = $('#no_so').val();
+
+      let win =  window.open(base_url+"transaksi/salesorder/cetak/"+no_so, "_blank");
+      win.focus();         
+      location.reload(true); //Reloads the current page from the server   
+	});
+</script>

@@ -40,9 +40,6 @@ $.widget.bridge('uibutton', $.ui.button);
 <!-- AdminLTE App -->
 <script src="<?php echo base_url();?>assets/dist/js/adminlte.min.js"></script>
 
-<!-- Format Uang -->
-<!-- <script src="<?php echo base_url();?>assets/dist/js/jquery.number.min.js"></script> -->
-
 <!-- colorpicker -->
 <script src='<?php echo base_url();?>assets/bower_components/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js'></script>
 
@@ -136,118 +133,99 @@ $('#dataTableDashboard2').DataTable({
 
 </script>
 
-<?php
-if($this->session->flashdata('psn_sukses')){
-$pesan = $this->session->flashdata('psn_sukses');
-echo '<script>';
-echo 'swal("'. $pesan .'", {icon: "success", button:false, timer:1500});';
-echo '</script>';
-}
-?>
-<?php
-if($this->session->flashdata('psn_error')){
-$pesan = $this->session->flashdata('psn_error');
-echo '<script>';
-echo 'swal("'. $pesan .'", {icon: "error", button:false, timer:1500});';
-echo '</script>';
-}
-?>
-
 <script>
- $('.hapus-data').on('click', function(e){
-    e.preventDefault(); //cancel default action
+    $('.hapus-data').on('click', function(e){
+        e.preventDefault(); //cancel default action
 
-    var href = $(this).attr('data-url');
+        var href = $(this).attr('data-url');
 
-    //pop up
-    swal({
-        title: "Anda yakin ingin menghapus data?",
-        icon: "warning",
-        buttons: ["Tidak", "Ya"],
-        dangerMode: true,
-    })
-    .then((hapus) => {
-      if (hapus) {
-        //swal("Data sudah dihapus!", {
-        //  icon: "success",
-        //});
-        window.location.href = href;
-        //setTimeout(function(){ window.location.href = href; }, 500);
-      }
-      else {
-      }
+        //pop up
+        swal({
+            title: "Anda yakin ingin menghapus data?",
+            icon: "warning",
+            buttons: ["Tidak", "Ya"],
+            dangerMode: true,
+        })
+        .then((hapus) => {
+          if (hapus) {
+            //swal("Data sudah dihapus!", {
+            //  icon: "success",
+            //});
+            window.location.href = href;
+            //setTimeout(function(){ window.location.href = href; }, 500);
+          }
+          else {
+          }
+        });
     });
-});
 
-function mask(textbox, e) {
-  var charCode = (e.which) ? e.which : e.keyCode;
-  if (charCode == 46 || charCode > 31&& (charCode < 48 || charCode > 57)) 
-    {
-        //alert("Only Numbers Allowed");
-        return false;
-    }
-  else
-    {
+    function mask(textbox, e) {
+      var charCode = (e.which) ? e.which : e.keyCode;
+      if (charCode == 46 || charCode > 31&& (charCode < 48 || charCode > 57)) 
+        {
+          //alert("Only Numbers Allowed");
+          return false;
+        }
+      else
+        {
         return true;
-    }
-  }
+        }
+      }
 
-function formatRupiah(angka)
-	{
-		var number_string = angka.replace(/[^,\d]/g, '').toString(),
-			split	= number_string.split(','),
-			sisa 	= split[0].length % 3,
-			rupiah 	= split[0].substr(0, sisa),
-			ribuan 	= split[0].substr(sisa).match(/\d{3}/gi);
-			
-		if (ribuan) {
-			separator = sisa ? '.' : '';
-			rupiah += separator + ribuan.join('.');
-		}
+    function formatRupiah(angka)
+      {
+        var number_string = angka.replace(/[^,\d]/g, '').toString(),
+        split	= number_string.split(','),
+        sisa 	= split[0].length % 3,
+        rupiah 	= split[0].substr(0, sisa),
+        ribuan 	= split[0].substr(sisa).match(/\d{3}/gi);
+
+      if (ribuan) {
+        separator = sisa ? '.' : '';
+        rupiah += separator + ribuan.join('.');
+      }
         return rupiah;
-	}
+      }
 
-  function convertToRupiah(angka)
-    {
-      var rupiah = '';		
-      var angkarev = angka.toString().split('').reverse().join('');
-      for(var i = 0; i < angkarev.length; i++) if(i%3 == 0) rupiah += angkarev.substr(i,3)+'.';
-      return rupiah.split('',rupiah.length-1).reverse().join('');
-    }
-/**
- * Usage example:
- * alert(convertToRupiah(10000000)); -> "Rp. 10.000.000"
- */
+    function convertToRupiah(angka)
+      {
+        var rupiah = '';		
+        var angkarev = angka.toString().split('').reverse().join('');
+        for(var i = 0; i < angkarev.length; i++) if(i%3 == 0) rupiah += angkarev.substr(i,3)+'.';
+        return rupiah.split('',rupiah.length-1).reverse().join('');
+      }
+      /**
+      * Usage example:
+      * alert(convertToRupiah(10000000)); -> "Rp. 10.000.000"
+      */
 
+   
+    function convertToAngka(rupiah)
+      {
+      return parseInt(rupiah.replace(/,.*|[^0-9]/g, ''), 10);
+      }
+      /**
+      * Usage example:
+      * alert(convertToAngka("Rp 10.000.123")); -> 10000123
+      */
 
-  function convertToAngka(rupiah)
-    {
-    return parseInt(rupiah.replace(/,.*|[^0-9]/g, ''), 10);
-    }
-/**
- * Usage example:
- * alert(convertToAngka("Rp 10.000.123")); -> 10000123
- */
-
-
-function PemisahTitik(objek) {
-	  separator = ".";
-	  a = objek.value;
-	  b = a.replace(/[^\d]/g,"");
-	  c = "";
-	  panjang = b.length; 
-	  j = 0; 
-	  for (i = panjang; i > 0; i--) {
-	    j = j + 1;
-	    if (((j % 3) == 1) && (j != 1)) {
-	      c = b.substr(i-1,1) + separator + c;
-	    } else {
-	      c = b.substr(i-1,1) + c;
-	    }
-	  }
-	  objek.value = c;
-
-	}   
+    function PemisahTitik(objek) {
+      separator = ".";
+      a = objek.value;
+      b = a.replace(/[^\d]/g,"");
+      c = "";
+      panjang = b.length; 
+      j = 0; 
+      for (i = panjang; i > 0; i--) {
+      j = j + 1;
+      if (((j % 3) == 1) && (j != 1)) {
+      c = b.substr(i-1,1) + separator + c;
+      } else {
+      c = b.substr(i-1,1) + c;
+      }
+      }
+      objek.value = c;
+    }   
 
 </script>
 
@@ -264,13 +242,13 @@ function PemisahTitik(objek) {
 			</div>
 		</div>
 		
-		<script>
-		$('#ModalGue').on('hide.bs.modal', function () {
-		   setTimeout(function(){ 
-		   		$('#ModalHeader, #ModalContent, #ModalFooter').html('');
-		   }, 500);
-		});
-    </script>
+<script>
+$('#ModalGue').on('hide.bs.modal', function () {
+    setTimeout(function(){ 
+      $('#ModalHeader, #ModalContent, #ModalFooter').html('');
+    }, 500);
+});
+</script>
     
 <!-- custom js -->
 <script src="<?php echo base_url();?>js/custom.js"></script>
