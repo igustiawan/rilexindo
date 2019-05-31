@@ -62,6 +62,19 @@
                   <li><a href="<?php echo base_url() .'transaksi/pembayaran';?>"><i class="fa fa-circle-o"></i> Pembayaran</a></li>
           </ul>
         </li>
+        <li class="treeview">
+          <a href="#">
+              <i class="fa fa-file"></i>
+              <span>Laporan</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+          </a>
+          <ul class="treeview-menu">  
+                  <li><a href="<?php echo base_url() .'laporan/lapstokgudang';?>"><i class="fa fa-circle-o"></i> Stok Gudang</a></li>
+          </ul>
+        </li>
+
       </ul>
     </section>
     <!-- /.sidebar -->

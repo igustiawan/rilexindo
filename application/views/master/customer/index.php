@@ -25,7 +25,7 @@
           <div class="box-body">
             <div class="row">
               <div class="col-md-12">
-                <table id="dataTable" class="table table-bordered table-striped">
+                <table id="dataTable" class="table table-bordered table-striped"> 
                  <thead>
                      <tr>
                          <th>KODE CUSTOMER</th>

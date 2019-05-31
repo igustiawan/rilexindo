@@ -9,6 +9,7 @@ class Salesorder extends MY_Controller {
 		$this->load->model('transaksi/M_spk','spk');
 		$this->load->model('master/M_salesman','salesman');
 		$this->load->model('master/M_leasing','leasing');   
+		$this->load->library('form_validation');   
 		$this->_cek_login();
 	}
 
