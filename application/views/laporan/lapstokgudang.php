@@ -15,16 +15,11 @@
           <div class="box-header with-border">
                 <form method="post" action="<?php echo base_url();?>laporan/lapstokgudang">
                     <div class="col-xs-3">
-                        <select class="form-control" name="status">
-                            <option value="">Semua Status</option>
-                            <option value="01">Intransit</option>
-                            <option value="02">Ready For Sale</option>
-                            <option value="03">Booked</option>
-                            <option value="04">SO</option>
-                            <option value="05">Sold</option>
-                            <option value="06">Bad/Repair</option>
+                        <select class="form-control" id="status" name="status">        
+                            <option value="" >Pilih Status</option>           
+                            <option>Received</option>
+                            <option>Sale to Customers</option>
                         </select>
-                        <?php echo form_error('status'); ?>
                     </div>
 
                     <button class="btn btn-primary" type="submit"><i class="fa fa-check"></i> Filter</button>

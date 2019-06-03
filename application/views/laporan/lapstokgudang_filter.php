@@ -6,7 +6,8 @@
     </h1>
   </section>
 
-<!-- Main content -->
+<!-- Main content --> 
+
   <section class="content">
   <!-- Main row -->
     <div class="row">
@@ -15,14 +16,10 @@
           <div class="box-header with-border">
                 <form method="post" action="<?php echo base_url();?>laporan/lapstokgudang">
                     <div class="col-xs-3">
-                        <select class="form-control" name="bulan">
-                            <option value="*">Semua Status</option>
-                            <option value="01">Intransit</option>
-                            <option value="02">Ready For Sale</option>
-                            <option value="03">Booked</option>
-                            <option value="04">SO</option>
-                            <option value="05">Sold</option>
-                            <option value="06">Bad/Repair</option>
+                        <select class="form-control" id="status" name="status">    
+                            <option value="" >Pilih Status</option>                     
+                            <option value="<?php echo set_value('status'); ?>" >Received</option>
+                            <option value="<?php echo set_value('status'); ?>" >Sale to Customers</option>
                         </select>
                         <?php echo form_error('status'); ?>
                     </div>
@@ -60,3 +57,35 @@
 <!-- /.content -->
 </div>
 <!-- /.content-wrapper-->
+
+<script>
+ var table;
+    $(document).ready(function() {
+        var status = $('#status').val()
+        alert($('#status').val());
+        //datatables
+        table = $('#dataTable').DataTable({ 
+            "processing": true, 
+            "serverSide": true, 
+            "order": [], 
+             
+            "ajax": {
+                "url": "<?php echo base_url('laporan/filterstokgudang')?>",
+                "type": "POST",
+                "data": function ( data ) { 
+                        // alert(data.status) ;
+                        //alert(document.getElementById("status").value);          
+                        data.status = $('#status').val();                    
+                }
+            },          
+            "columnDefs": [
+            { 
+                "targets": [ 0 ], 
+                "orderable": false, 
+            },
+            ],
+ 
+        });
+ 
+    });
+</script>
