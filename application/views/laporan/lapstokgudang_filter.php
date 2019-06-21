@@ -14,22 +14,32 @@
       <div class="col-md-12">
         <div class="box box-primary">   
           <div class="box-header with-border">
-                <form method="post" action="<?php echo base_url();?>laporan/lapstokgudang">
-                    <div class="col-xs-3">
-                        <select class="form-control" id="status" name="status">    
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title" >Custom Filter : </h3>
+                </div>
+                <div class="panel-body">
+                  <form id="form-filter" class="form-horizontal">
+                      <div class="form-group">
+                        <label for="LastName" class="col-sm-2 control-label">Status</label>
+                          <div class="col-sm-4">
+                            <select class="form-control" id="status" name="status">    
                             <option value="" >Pilih Status</option>                     
-                            <option value="<?php echo set_value('status'); ?>" >Received</option>
-                            <option value="<?php echo set_value('status'); ?>" >Sale to Customers</option>
-                        </select>
-                        <?php echo form_error('status'); ?>
-                    </div>
-
-                    <button class="btn btn-primary" type="submit"><i class="fa fa-check"></i> Filter</button>
-                    <!-- <a class="btn btn-success" href="<?php echo base_url();?>akunting/rugilaba_print"><i class="fa fa-print"></i> Print</a> -->
-                </form>  
-            <!-- <div class="pull-left">
-                 <a href="<?php echo base_url();?>laporan/preview" class="btn btn-primary"><i class="fa fa-search"></i> Filter</a>                        
-            </div> -->
+                            <option value="Received" >Received</option>
+                            <option value="Sale to Customers" >Sale to Customers</option>
+                            </select>
+                          </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="LastName" class="col-sm-2 control-label"></label>
+                        <div class="col-sm-4">
+                          <button type="button" id="btn-filter" class="btn btn-primary">Filter</button>
+                          <button type="button" id="btn-download" class="btn btn-default">Download</button>
+                        </div>
+                      </div>
+                  </form>
+                </div>
+              </div>            
           </div>
           <div class="box-body">
             <div class="row">     
@@ -46,24 +56,18 @@
                         </tr>
                     </thead>                 
                  </table> 
-                </div><!-- /.col -->
-              </div><!-- /.row -->
-            </div><!--box body-->
-          </div><!-- /.box -->
-        </div><!-- /.col -->
-    </div><!-- /.row -->
-  <!-- /.row (main row) -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
   </section>
-<!-- /.content -->
 </div>
-<!-- /.content-wrapper-->
 
 <script>
  var table;
     $(document).ready(function() {
-        var status = $('#status').val()
-        alert($('#status').val());
-        //datatables
         table = $('#dataTable').DataTable({ 
             "processing": true, 
             "serverSide": true, 
@@ -72,9 +76,7 @@
             "ajax": {
                 "url": "<?php echo base_url('laporan/filterstokgudang')?>",
                 "type": "POST",
-                "data": function ( data ) { 
-                        // alert(data.status) ;
-                        //alert(document.getElementById("status").value);          
+                "data": function ( data ) {          
                         data.status = $('#status').val();                    
                 }
             },          
@@ -86,6 +88,8 @@
             ],
  
         });
- 
+        $('#btn-filter').click(function(){ //button filter event click
+        table.ajax.reload();  //just reload table
+    });
     });
 </script>

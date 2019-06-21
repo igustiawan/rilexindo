@@ -18,18 +18,9 @@ class Laporan extends MY_Controller {
     }
 
     function lapstokgudang()
-	{
-       
+	{    
 		$status=$this->input->post('status');
-		
-        $this->form_validation->set_rules('status', 'Status', 'required');
-		$this->form_validation->set_message('required', '%s harus diisi');
-
-        if($this->form_validation->run() == TRUE){	
-            $this->render_template('laporan/lapstokgudang_filter');
-        } else {
-			$this->render_template('laporan/lapstokgudang');
-        }
+		$this->render_template('laporan/lapstokgudang_filter');
 	} 
 	
 	function filterstokgudang()
